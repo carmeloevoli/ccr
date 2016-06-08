@@ -2,6 +2,9 @@
 #define CONSTANTS_H_
 
 #include <cmath>
+#include <iostream>
+
+using namespace std;
 
 // pows
 #define pow2(A) ((A)*(A))
@@ -85,8 +88,9 @@ static const double mass_sun = 1.989e30 * kilogram;
 static const double h_planck = 6.62606957e-27 * erg * second;
 static const double h_bar_planck = h_planck / 2. / M_PI;
 static const double k_boltzmann = 1.3806488e-16 * erg / kelvin;
-static const double G = 6.674e-8 * pow3(cm) / gram / pow2(second);
+static const double G = 6.67259e-8 * pow3(cm) / gram / pow2(second);
 static const double pi_re2_me_c2_c = M_PI * pow2(electron_radius) * c_light * mass_electron_c2; /* Pi * e^4 / mc */
+static const double pi_re_h_bar2_c2 = M_PI * electron_radius * pow2(h_bar_planck) * pow2(c_light); // erg^2* cm^3
 
 static const double A_H = 1;
 static const double Z_H = 1;
@@ -95,23 +99,32 @@ static const double A_He = 4;
 static const double Z_He = 2;
 static const double ionization_potential_He = 24.6 * eV;
 
-// PLANCK
+// PLANCK Cosmological constants
 static const double hlittle = 0.673;
-static const double Omega_m = 0.26472;
+static const double Omega_m = 0.32;
 static const double Omega_l = 1.0 - Omega_m;
-static const double Omega_b = 0.0490214;
+static const double Omega_b = (0.022 / hlittle) / hlittle;
 static const double Omega_n = 0.0;
 static const double Omega_k = 0.0;
 static const double Omega_r = 8.6e-5;
 static const double Omega_tot = 1.0;
 static const double Y_He = 0.247695;
+static const double T_cmb = 2.728 * K;
 
-// cosmological constants
+// PLANCK derived
 static const double H_0 = hlittle * 3.2407e-18 / s;
 static const double rho_crit = 3.0 * H_0 * H_0 / (8.0 * M_PI * G);  /* at z = 0 */
 static const double n_H_0 = rho_crit * Omega_b * (1.0 - Y_He) / mass_proton; /*  current hydrogen number density estimate ~1.92e-7 */
 static const double n_He_0 = rho_crit * Omega_b * Y_He / (4.0 * mass_proton); /*  current helium number density estimate */
 static const double f_H = n_H_0 / (n_H_0 + n_He_0); /* hydrogen number fraction */
 static const double f_He = n_He_0 / (n_H_0 + n_He_0); /* helium number fraction */
+
+// source constants
+static const double reference_energy = 1. * GeV;
+static const double slope = 2.2;
+
+#include "cosmology_params.h"
+#include "anal_params.h"
+#include "heat_params.h"
 
 #endif /* CONSTANTS_H_ */
