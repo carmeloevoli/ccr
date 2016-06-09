@@ -556,7 +556,7 @@ namespace fast {
     }
     
     
-    /* function HeI_ion_crosssec returns the HI ionization cross section at parameter frequency 
+    /* function HeI_ion_crosssec returns the HI ionization cross section at parameter frequency
      (taken from Verner et al (1996) */
     double HeI_ion_crosssec(double nu){
         double x,y;//,Fy;
@@ -572,7 +572,7 @@ namespace fast {
     }
     
     
-    /* function HeII_ion_crosssec returns the HeII ionization cross section at parameter frequency 
+    /* function HeII_ion_crosssec returns the HeII ionization cross section at parameter frequency
      (taken from Osterbrock, pg. 14) */
     double HeII_ion_crosssec(double nu){
         double epsilon, Z = 2;
@@ -584,12 +584,12 @@ namespace fast {
             nu+=TINY;
         
         epsilon = sqrt( nu/HeII_NUIONIZATION - 1);
-        return (6.3e-18)/Z/Z * pow(HeII_NUIONIZATION/nu, 4) 
+        return (6.3e-18)/Z/Z * pow(HeII_NUIONIZATION/nu, 4)
         * pow(E, 4-(4*atan(epsilon)/epsilon)) / (1-pow(E, -2*PI/epsilon));
     }
     
     
-    /* function HI_ion_crosssec returns the HI ionization cross section at parameter frequency 
+    /* function HI_ion_crosssec returns the HI ionization cross section at parameter frequency
      (taken from Osterbrock, pg. 14) */
     double HI_ion_crosssec(double nu){
         double epsilon, Z = 1;
@@ -601,11 +601,11 @@ namespace fast {
             nu+=TINY;
         
         epsilon = sqrt( nu/NUIONIZATION - 1);
-        return (6.3e-18)/Z/Z * pow(NUIONIZATION/nu, 4) 
+        return (6.3e-18)/Z/Z * pow(NUIONIZATION/nu, 4)
         * pow(E, 4-(4*atan(epsilon)/epsilon)) / (1-pow(E, -2*PI/epsilon));
     }
     
-}
+} /* namespace */
 
 
 

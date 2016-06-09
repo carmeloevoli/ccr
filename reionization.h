@@ -11,13 +11,13 @@ public:
     
     void init_reionization();
     void evolve();
-    void print_status();
+    void print_status(bool doTitle);
     
     void print_hmf(const double& z, const double& M_min, const double& M_max);
     double integrate_hmf(double z, const double& M_min, const double& M_max);
     double Galaxy_ionization_rate(const double& z);
     double Galaxy_heating_rate(const double& z);
-
+    
     inline void set_dz(const double& dz) {
         this->dz = dz;
     }
@@ -37,10 +37,10 @@ private:
     double x_e;
     double T_k;
     double f_sfr;
-    double f_alpha;
+    double f_lya;
     double clumping_factor;
     double min_sfr_halo;
-    double mass_in_halos;
+    double hmf_integral;
     double ionization_rate;
     double recombination_rate;
     double star_formation_rate;

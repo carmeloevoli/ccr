@@ -4,8 +4,8 @@ Reionization::Reionization() {
     fast::init_ps();
     init_reionization();
     clumping_factor = 1;
-    f_sfr = 0.1 / Gyr;
-    f_alpha = 1 / mass_sun / pow3(Mpc);
+    f_sfr = 0.1;
+    f_lya = 1e60 / mass_sun;
 }
 
 Reionization::~Reionization() {}
@@ -21,34 +21,39 @@ void Reionization::evolve() {
     double dx_e = 0;
     double dT_k = 0;
     
-    while (z > 0) {
+    print_status(true);
     
+    while (z > 0) {
+        
         dt = fast::dtdz(z) * dz;
         min_sfr_halo = min_star_forming_halo(z); // M
-        mass_in_halos = integrate_hmf(z, min_sfr_halo, 1e12 * mass_sun); // M V^-1
-        star_formation_rate = f_sfr * mass_in_halos; // M V^-1 T^-1
-        ionization_rate = f_alpha * star_formation_rate; // T^-1
+        hmf_integral = integrate_hmf(z, min_sfr_halo, 1e12 * mass_sun); // M V^-1 T^-1
+        star_formation_rate = f_sfr * Omega_b / (Omega_m - Omega_b) * hmf_integral; // M V^-1 T^-1
+        ionization_rate = f_lya * star_formation_rate / n_H_physical(z); // T^-1
         recombination_rate = fast::alpha_A(T_k) * n_H_physical(z) * pow2(x_e) * clumping_factor; // L^3 T^-1 L^-3
         
-        //dx_e = -dt * (Galaxy_ionization_rate(z) - fast::alpha_A(T_k) * n_H_physical(z) * pow2(x_e) * clumping_factor); // cm^3 s^-1 cm^-3
-;
+        dx_e = -dt * (ionization_rate - recombination_rate); // cm^3 s^-1 cm^-3;
+        
         dT_k = 0;
         x_e += dx_e;
         T_k += dT_k;
         z -= dz;
         
-        print_status();
+        print_status(false);
     }
 }
 
-void Reionization::print_status() {
-    if (z > 0) {
+void Reionization::print_status(bool doTitle) {
+    if (doTitle) {
+        cout << "#z - x_e - T_k [K] - min_sfr_halo [M_sun] - halo_integral [M_sun Mpc^-3 yr^-1] - SFR [M_sun Mpc^-3 yr^-1] - Ion Rate [Myr^-1] - Rec Rate [Myr^-1]" << "\n";
+    }
+    else if (z > 0) {
         cout << scientific << setprecision(3);
         cout << z << "\t";
         cout << x_e << "\t";
         cout << T_k << "\t";
         cout << min_sfr_halo / mass_sun << "\t";
-        cout << mass_in_halos / (mass_sun / pow3(Mpc)) << "\t";
+        cout << hmf_integral / (mass_sun / pow3(Mpc) / year) << "\t";
         cout << star_formation_rate / (mass_sun / pow3(Mpc) / year) << "\t";
         cout << ionization_rate / (1. / Myr) << "\t";
         cout << recombination_rate / (1. / Myr) << "\t";
@@ -94,7 +99,7 @@ double hmf_function (double M, void *params) {
     double z = *(double *) params;
     double dNdM = fast::dNdM_st(z, M / mass_sun) / pow3(Mpc) / mass_sun;
     //printf ("%5.2e %5.2e %5.2e\n", z, M, dNdM);
-    return M * dNdM;
+    return M * dNdM / free_fall_timescale(z, M);
 }
 
 double Reionization::integrate_hmf(double z, const double& M_min, const double& M_max) {

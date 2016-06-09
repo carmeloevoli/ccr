@@ -28,4 +28,6 @@ void print_timescales(string filename, const double& z);
 
 double min_star_forming_halo(const double& z);
 
+double free_fall_timescale(const double& z, const double& M);
+
 #endif /* UTILITIES_H_ */

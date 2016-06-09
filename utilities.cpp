@@ -60,6 +60,18 @@ double fragmentation_timescale(const double& n_H) {
     return 6e7 * year / n_H; // arXiv:1208.4979
 }
 
+double free_fall_timescale(const double& z, const double& halo_mass) {
+    
+    double virial_radius_comoving = fast::MtoRvir(z, halo_mass / mass_sun) * Mpc; // M in M_sun, Rvir in comoving Mpc
+    double virial_radius_physical = virial_radius_comoving / (1. + z);
+    
+    double virial_volume_phyisical = 4./3. * M_PI * pow3(virial_radius_physical);
+    
+    double halo_dark_density = halo_mass / virial_volume_phyisical;
+    
+    return sqrt(3. * M_PI / 32. / G / halo_dark_density);
+}
+
 /* returns the proper mean baryonic density at z in cm^-3 */
 double n_H_physical(const double & z) {
     return n_H_0 * pow(1. + z, 3.);

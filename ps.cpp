@@ -723,7 +723,7 @@ namespace fast {
         F.function = &dsigma_dk;
         
         gsl_integration_qag (&F, lower_limit, upper_limit, 0, rel_tol,
-                             1000, GSL_INTEG_GAUSS61, w, &result, &error); 
+                             1000, GSL_INTEG_GAUSS61, w, &result, &error);
         gsl_integration_workspace_free (w);
         
         sigma_norm = SIGMA8/sqrt(result); //takes care of volume factor
@@ -762,4 +762,4 @@ namespace fast {
             return exp(gsl_spline_eval(erfc_spline, x, erfc_acc));
     }
     
-}
+} /* namespace */
