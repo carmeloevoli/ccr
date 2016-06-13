@@ -63,6 +63,7 @@ double fragmentation_timescale(const double& n_H) {
 double free_fall_timescale(const double& z, const double& halo_mass) {
     
     double virial_radius_comoving = fast::MtoRvir(z, halo_mass / mass_sun) * Mpc; // M in M_sun, Rvir in comoving Mpc
+
     double virial_radius_physical = virial_radius_comoving / (1. + z);
     
     double virial_volume_phyisical = 4./3. * M_PI * pow3(virial_radius_physical);

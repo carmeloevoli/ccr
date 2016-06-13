@@ -11,7 +11,6 @@ double sigma_norm, R, theta_cmb, omhh, z_equality, y_d, sound_horizon, alpha_nu,
 
 int main() {
     
-    
     //print_timescales("output/timescales_at_z10.txt", 10);
     
     //print_timescales("output/timescales_at_z20.txt", 20);
@@ -24,8 +23,12 @@ int main() {
     
     R->init_reionization();
     
-    R->set_dz(0.2);
+    R->set_dz(0.01);
     
+    R->set_f_sfr(0.04);
+    
+    R->set_f_lya(1e63 / mass_sun);
+
     R->evolve();
     
     delete R;

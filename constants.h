@@ -100,10 +100,10 @@ static const double Z_He = 2;
 static const double ionization_potential_He = 24.6 * eV;
 
 // PLANCK Cosmological constants
-static const double hlittle = 0.673;
-static const double Omega_m = 0.32;
+static const double hlittle = 0.6711;
+static const double Omega_m = 0.3175;
 static const double Omega_l = 1.0 - Omega_m;
-static const double Omega_b = (0.022 / hlittle) / hlittle;
+static const double Omega_b = (0.022068 / hlittle) / hlittle;
 static const double Omega_n = 0.0;
 static const double Omega_k = 0.0;
 static const double Omega_r = 8.6e-5;

@@ -3,41 +3,48 @@
 Reionization::Reionization() {
     fast::init_ps();
     init_reionization();
-    clumping_factor = 1;
-    f_sfr = 0.1;
-    f_lya = 1e60 / mass_sun;
+    clumping_factor = 2.;
+    f_sfr = 4e-2;
+    f_lya = 1e63 / mass_sun;
 }
 
 Reionization::~Reionization() {}
 
 void Reionization::init_reionization() {
-    x_e = 1e-4;
-    T_k = 1e4 * K;
+    x_II = 1e-4;
+    T_k = 1e3 * K;
     z = 30.;
+    optical_depth = 0;
 }
 
 void Reionization::evolve() {
     double dt = 0;
-    double dx_e = 0;
+    double dx_II = 0;
     double dT_k = 0;
-    
+    double n_e = 0;
     print_status(true);
     
     while (z > 0) {
         
-        dt = fast::dtdz(z) * dz;
+        dt = -fast::dtdz(z) * dz;
+        
         min_sfr_halo = min_star_forming_halo(z); // M
         hmf_integral = integrate_hmf(z, min_sfr_halo, 1e12 * mass_sun); // M V^-1 T^-1
-        star_formation_rate = f_sfr * Omega_b / (Omega_m - Omega_b) * hmf_integral; // M V^-1 T^-1
-        ionization_rate = f_lya * star_formation_rate / n_H_physical(z); // T^-1
-        recombination_rate = fast::alpha_A(T_k) * n_H_physical(z) * pow2(x_e) * clumping_factor; // L^3 T^-1 L^-3
+        star_formation_rate_comoving = f_sfr * Omega_b / (Omega_m - Omega_b) * hmf_integral; // M V^-1 T^-1
+        star_formation_rate_physical = star_formation_rate_comoving * pow3(1. + z); // M V^-1 T^-1
+        ionization_rate = c_light * SIGMAT * f_lya * (1. - x_II) * star_formation_rate_physical * dt; // T^-1
+        recombination_rate = fast::alpha_A(T_k) * clumping_factor * (1. + f_He) * n_H_physical(z) * pow2(x_II); // L^3 T^-1 L^-3
         
-        dx_e = -dt * (ionization_rate - recombination_rate); // cm^3 s^-1 cm^-3;
+        dx_II = dt * (ionization_rate - recombination_rate); // cm^3 s^-1 cm^-3;
         
         dT_k = 0;
-        x_e += dx_e;
+        x_II += dx_II;
         T_k += dT_k;
         z -= dz;
+        
+        n_e = (1. + f_He) * x_II * n_H_physical(z);
+        
+        optical_depth += SIGMAT * n_e * c_light * dt;
         
         print_status(false);
     }
@@ -45,16 +52,17 @@ void Reionization::evolve() {
 
 void Reionization::print_status(bool doTitle) {
     if (doTitle) {
-        cout << "#z - x_e - T_k [K] - min_sfr_halo [M_sun] - halo_integral [M_sun Mpc^-3 yr^-1] - SFR [M_sun Mpc^-3 yr^-1] - Ion Rate [Myr^-1] - Rec Rate [Myr^-1]" << "\n";
+        cout << "#z - x_e - T_k [K] - optical_depth - min_sfr_halo [M_sun] - halo_integral [M_sun Mpc^-3 yr^-1] - SFR [M_sun Mpc^-3 yr^-1] - Ion Rate [Myr^-1] - Rec Rate [Myr^-1]" << "\n";
     }
     else if (z > 0) {
         cout << scientific << setprecision(3);
         cout << z << "\t";
-        cout << x_e << "\t";
+        cout << x_II << "\t";
         cout << T_k << "\t";
+        cout << optical_depth << "\t";
         cout << min_sfr_halo / mass_sun << "\t";
         cout << hmf_integral / (mass_sun / pow3(Mpc) / year) << "\t";
-        cout << star_formation_rate / (mass_sun / pow3(Mpc) / year) << "\t";
+        cout << star_formation_rate_comoving / (mass_sun / pow3(Mpc) / year) << "\t";
         cout << ionization_rate / (1. / Myr) << "\t";
         cout << recombination_rate / (1. / Myr) << "\t";
         cout << "\n";

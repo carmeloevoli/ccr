@@ -22,19 +22,26 @@ public:
         this->dz = dz;
     }
     
-    inline void set_xe(const double& x_e) {
-        this->x_e = x_e;
+    inline void set_xII(const double& x_II) {
+        this->x_II = x_II;
     }
     
     inline void set_Tk(const double& T_k) {
         this->T_k = T_k;
     }
     
+    inline void set_f_sfr(const double& f_sfr) {
+        this->f_sfr = f_sfr;
+    }
+    
+    inline void set_f_lya(const double& f_lya) {
+        this->f_lya = f_lya;
+    }
     
 private:
     double z;
     double dz;
-    double x_e;
+    double x_II;
     double T_k;
     double f_sfr;
     double f_lya;
@@ -43,7 +50,9 @@ private:
     double hmf_integral;
     double ionization_rate;
     double recombination_rate;
-    double star_formation_rate;
+    double star_formation_rate_comoving;
+    double star_formation_rate_physical;
+    double optical_depth;
 };
 
 #endif

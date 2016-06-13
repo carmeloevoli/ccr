@@ -10,7 +10,7 @@ all: $(EXEC)
 $(EXEC): main.o misc.o cosmo_progs.o ps.o reionization.o utilities.o
 	$(CC) $(CFLAGS) $(INCDIR) -o $@ $^ $(LIBDIR)
 
-%.o: %.cpp
+%.o: %.cpp constants.h
 	$(CC) $(CFLAGS) $(INCDIR) -c -o $@ $< 	
 
 .PHONY: clean
