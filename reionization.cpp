@@ -24,6 +24,8 @@ void Reionization::evolve() {
     double n_e = 0;
     print_status(true);
     
+    double normalization_integral = compute_spectrum_normalization(reference_energy, SN_E_min, SN_E_max, SN_slope);
+ 
     while (z > 0) {
         
         dt = -fast::dtdz(z) * dz;
@@ -34,6 +36,8 @@ void Reionization::evolve() {
         star_formation_rate_physical = star_formation_rate_comoving * pow3(1. + z); // M V^-1 T^-1
         ionization_rate = c_light * SIGMAT * f_lya * (1. - x_II) * star_formation_rate_physical * dt; // T^-1
         recombination_rate = fast::alpha_A(T_k) * clumping_factor * (1. + f_He) * n_H_physical(z) * pow2(x_II); // L^3 T^-1 L^-3
+        sn_energy_rate = SN_efficiency * SN_kinetic_energy * SN_fraction * star_formation_rate_physical; // E V^-1 T^-1
+        cz = sn_energy_rate / pow2(reference_energy) / normalization_integral;
         
         dx_II = dt * (ionization_rate - recombination_rate); // cm^3 s^-1 cm^-3;
         
@@ -47,6 +51,10 @@ void Reionization::evolve() {
         optical_depth += SIGMAT * n_e * c_light * dt;
         
         print_status(false);
+        
+        
+        
+        
     }
 }
 
@@ -63,6 +71,8 @@ void Reionization::print_status(bool doTitle) {
         cout << min_sfr_halo / mass_sun << "\t";
         cout << hmf_integral / (mass_sun / pow3(Mpc) / year) << "\t";
         cout << star_formation_rate_comoving / (mass_sun / pow3(Mpc) / year) << "\t";
+        cout << sn_energy_rate / (erg / pow3(cm) / s) << "\t";
+        cout << cz / (1. / erg / pow3(cm) / s) << "\t";
         cout << ionization_rate / (1. / Myr) << "\t";
         cout << recombination_rate / (1. / Myr) << "\t";
         cout << "\n";

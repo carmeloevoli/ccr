@@ -30,4 +30,6 @@ double min_star_forming_halo(const double& z);
 
 double free_fall_timescale(const double& z, const double& M);
 
+double compute_spectrum_normalization(double E_0, double E_min, double E_max, double alpha);
+
 #endif /* UTILITIES_H_ */

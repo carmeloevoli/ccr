@@ -121,7 +121,12 @@ static const double f_He = n_He_0 / (n_H_0 + n_He_0); /* helium number fraction 
 
 // source constants
 static const double reference_energy = 1. * GeV;
-static const double slope = 2.2;
+static const double SN_slope = 2.2;
+static const double SN_efficiency = 0.1;
+static const double SN_kinetic_energy = 1e51 * erg;
+static const double SN_fraction = 0.01 / mass_sun;
+static const double SN_E_min = 0.1 * GeV;
+static const double SN_E_max = 1e6 * GeV;
 
 #include "cosmology_params.h"
 #include "anal_params.h"

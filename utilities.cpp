@@ -63,7 +63,7 @@ double fragmentation_timescale(const double& n_H) {
 double free_fall_timescale(const double& z, const double& halo_mass) {
     
     double virial_radius_comoving = fast::MtoRvir(z, halo_mass / mass_sun) * Mpc; // M in M_sun, Rvir in comoving Mpc
-
+    
     double virial_radius_physical = virial_radius_comoving / (1. + z);
     
     double virial_volume_phyisical = 4./3. * M_PI * pow3(virial_radius_physical);
@@ -88,7 +88,7 @@ double spectrum(const double& E_k) {
     
     double p_0 = sqrt(E_k_0 * E_k_0 + 2. * mass_proton_c2 * E_k_0);
     
-    return normalization * pow(p / p_0, -slope);
+    return normalization * pow(p / p_0, -SN_slope);
 }
 
 double compute_source_normalization() {
@@ -123,4 +123,29 @@ void print_timescales(string filename, const double& z) {
         outfile << fragmentation_timescale(n_H) << "\n";
     }
     outfile.close();
+}
+
+double I_spectrum(double x, void * params) {
+    double alpha = *(double *) params;
+    double E_0 = *((double *)params + 1);
+    double f = x * pow((E_0 * x * x + 2. * mass_proton_c2 * x) / (E_0 + 2. * mass_proton_c2), - .5 * alpha);
+    return f;
+}
+
+double compute_spectrum_normalization(double E_0, double E_min, double E_max, double alpha) {
+    
+    gsl_integration_workspace * w
+    = gsl_integration_workspace_alloc (10000);
+    
+    double result, error;
+    double params[2] = {alpha, E_0};
+    gsl_function F;
+    F.function = &I_spectrum;
+    F.params = params;
+    
+    gsl_integration_qag (&F, E_min / E_0, E_max / E_0, 0, 1e-5, 10000, 3, w, &result, &error);
+    
+    gsl_integration_workspace_free (w);
+    
+    return result;
 }

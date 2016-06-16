@@ -11,6 +11,17 @@ double sigma_norm, R, theta_cmb, omhh, z_equality, y_d, sound_horizon, alpha_nu,
 
 int main() {
     
+//    cout << compute_spectrum_normalization(1. * GeV, 0.1 * GeV, 1e4 * GeV, 1e51 * erg, 2.2) << endl;
+
+//    cout << compute_spectrum_normalization(1. * GeV, 0.1 * GeV, 1e5 * GeV, 1e51 * erg, 2.2) << endl;
+
+//    cout << compute_spectrum_normalization(1. * GeV, 0.1 * GeV, 1e6 * GeV, 1e51 * erg, 2.2) << endl;
+
+  //  cout << compute_spectrum_normalization(1. * GeV, 0.01 * GeV, 1e6 * GeV, 1e51 * erg, 2.2) << endl;
+
+    //cout << compute_spectrum_normalization(1. * GeV, 0.001 * GeV, 1e6 * GeV, 1e51 * erg, 2.2) << endl;
+
+
     //print_timescales("output/timescales_at_z10.txt", 10);
     
     //print_timescales("output/timescales_at_z20.txt", 20);
@@ -27,8 +38,8 @@ int main() {
     
     R->set_f_sfr(0.04);
     
-    R->set_f_lya(1e63 / mass_sun);
-
+    R->set_f_lya(3e63 / mass_sun);
+    
     R->evolve();
     
     delete R;

@@ -53,6 +53,8 @@ private:
     double star_formation_rate_comoving;
     double star_formation_rate_physical;
     double optical_depth;
+    double sn_energy_rate;
+    double cz;
 };
 
 #endif
