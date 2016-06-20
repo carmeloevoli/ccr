@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "constants.h"
 #include "cosmo_progs.h"
@@ -31,5 +32,7 @@ double min_star_forming_halo(const double& z);
 double free_fall_timescale(const double& z, const double& M);
 
 double compute_spectrum_normalization(double E_0, double E_min, double E_max, double alpha);
+
+double compute_initial_tau(const double& init_redshift);
 
 #endif /* UTILITIES_H_ */

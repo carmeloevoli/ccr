@@ -7,7 +7,7 @@ LIBDIR += -L$(GSL_DIR)/lib -lgsl
 
 all: $(EXEC) 
 
-$(EXEC): main.o misc.o cosmo_progs.o ps.o reionization.o utilities.o
+$(EXEC): main.o SFR.o misc.o cosmo_progs.o ps.o reionization.o utilities.o
 	$(CC) $(CFLAGS) $(INCDIR) -o $@ $^ $(LIBDIR)
 
 %.o: %.cpp constants.h

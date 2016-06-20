@@ -1,60 +1,113 @@
 #include "reionization.h"
 
 Reionization::Reionization() {
-    fast::init_ps();
     init_reionization();
     clumping_factor = 2.;
     f_sfr = 4e-2;
-    f_lya = 1e63 / mass_sun;
+    f_UV = 1e63 / mass_sun;
+    optical_depth_PLANCK = 0.055 + 3. * 0.009;
 }
 
 Reionization::~Reionization() {}
 
 void Reionization::init_reionization() {
     x_II = 1e-4;
-    T_k = 1e3 * K;
-    z = 30.;
+    T_k = 1e0 * K;
+    z = initial_redshift;
     optical_depth = 0;
+    heating_rate = 0;
+    ionization_rate = 0;
+    recombination_rate = 0;
+}
+
+void Reionization::read_SFR(const string& filename) {
+    ifstream file_to_read(filename.c_str());
+    const int num_of_header_lines = 1;
+    
+    for (int i = 0; i < num_of_header_lines; ++i)
+        file_to_read.ignore(512, '\n');
+    
+    while(!file_to_read.eof()) {
+        double x, y1, y2;
+        file_to_read >> x >> y1 >> y2;
+        if (!file_to_read.eof()) {
+            hmf_z.push_back(x);
+            hmf_integral.push_back(y2);
+        }
+    }
+    //cout << "HMF vector size = " << hmf_z.size() << endl;
+}
+
+double Reionization::hmf_integral_interpolate(const double& x) {
+    if (x > 49) {
+        cout << "z too large in interpolation!" << "\n";
+        exit(1);
+    }
+    size_t i = 0;
+    bool found = false;
+    vector<double>::iterator it = hmf_z.begin();
+    while (it != hmf_z.end() && !found) {
+        it++;
+        if (*it > x) {
+            found = true;
+            i = it - hmf_z.begin() - 1;
+        }
+    }
+    
+    double x_0 = hmf_z.at(i);
+    double x_1 = hmf_z.at(i + 1);
+    double y_0 = hmf_integral.at(i);
+    double y_1 = hmf_integral.at(i + 1);
+    double y = y_0 + (y_1 - y_0) * (x - x_0) / (x_1 - x_0);
+    
+    return y;
 }
 
 void Reionization::evolve() {
     double dt = 0;
     double dx_II = 0;
-    double dT_k = 0;
+    double dT_k_dz = 0;
     double n_e = 0;
+    
+    size_t counter = 0;
+    
     print_status(true);
     
+    const double UV_photoionization_cs = 6.3e-18 / pow2(cm);
+    
     double normalization_integral = compute_spectrum_normalization(reference_energy, SN_E_min, SN_E_max, SN_slope);
- 
+    
+    //double initial_tau = compute_initial_tau(initial_redshift);
+    
     while (z > 0) {
         
-        dt = -fast::dtdz(z) * dz;
+        counter++;
         
-        min_sfr_halo = min_star_forming_halo(z); // M
-        hmf_integral = integrate_hmf(z, min_sfr_halo, 1e12 * mass_sun); // M V^-1 T^-1
-        star_formation_rate_comoving = f_sfr * Omega_b / (Omega_m - Omega_b) * hmf_integral; // M V^-1 T^-1
+        dt = fast::dtdz(z) * dz;
+        
+        star_formation_rate_comoving = f_sfr * Omega_b / (Omega_m - Omega_b) * hmf_integral_interpolate(z); // M V^-1 T^-1
         star_formation_rate_physical = star_formation_rate_comoving * pow3(1. + z); // M V^-1 T^-1
-        ionization_rate = c_light * SIGMAT * f_lya * (1. - x_II) * star_formation_rate_physical * dt; // T^-1
+        ionization_rate = c_light * UV_photoionization_cs * f_UV * (1. - x_II) * star_formation_rate_physical * fabs(dt); // T^-1
         recombination_rate = fast::alpha_A(T_k) * clumping_factor * (1. + f_He) * n_H_physical(z) * pow2(x_II); // L^3 T^-1 L^-3
+        heating_rate = (13.6 * eV) * f_UV * star_formation_rate_physical / n_H_physical(z); // E / T
+        
         sn_energy_rate = SN_efficiency * SN_kinetic_energy * SN_fraction * star_formation_rate_physical; // E V^-1 T^-1
         cz = sn_energy_rate / pow2(reference_energy) / normalization_integral;
         
         dx_II = dt * (ionization_rate - recombination_rate); // cm^3 s^-1 cm^-3;
         
-        dT_k = 0;
-        x_II += dx_II;
-        T_k += dT_k;
+        dT_k_dz = 2. * T_k / (1. + z) - T_k / (1. + x_II) * (dx_II / dz) + 2. / 3. / k_boltzmann / (1. + x_II) * fast::dtdz(z) * heating_rate;
+        
+        x_II -= dx_II;
+        T_k -= dT_k_dz * dz;
         z -= dz;
         
         n_e = (1. + f_He) * x_II * n_H_physical(z);
         
-        optical_depth += SIGMAT * n_e * c_light * dt;
+        optical_depth += SIGMAT * n_e * c_light * -dt;
         
-        print_status(false);
-        
-        
-        
-        
+        if (counter % 100000 == 0)
+            print_status(false);
     }
 }
 
@@ -68,8 +121,9 @@ void Reionization::print_status(bool doTitle) {
         cout << x_II << "\t";
         cout << T_k << "\t";
         cout << optical_depth << "\t";
-        cout << min_sfr_halo / mass_sun << "\t";
-        cout << hmf_integral / (mass_sun / pow3(Mpc) / year) << "\t";
+        cout << optical_depth_PLANCK << "\t";
+        //cout << min_sfr_halo / mass_sun << "\t";
+        //cout << hmf_integral / (mass_sun / pow3(Mpc) / year) << "\t";
         cout << star_formation_rate_comoving / (mass_sun / pow3(Mpc) / year) << "\t";
         cout << sn_energy_rate / (erg / pow3(cm) / s) << "\t";
         cout << cz / (1. / erg / pow3(cm) / s) << "\t";
@@ -77,69 +131,4 @@ void Reionization::print_status(bool doTitle) {
         cout << recombination_rate / (1. / Myr) << "\t";
         cout << "\n";
     }
-}
-
-double Reionization::Galaxy_ionization_rate(const double& z) {
-    //double mass_formed = integrate_hmf(z, min_star_forming_halo(z), 1e12 * mass_sun);
-    
-    //cout << z << "\t" << mass_formed / mass_sun << "\n";
-    
-    return 0;
-}
-
-double Reionization::Galaxy_heating_rate(const double& z) {
-    return 0;
-}
-
-void Reionization::print_hmf(const double& z, const double& M_min, const double& M_max) {
-    /*
-     FUNCTION dNdM(z, M)
-     Computes the Press_schechter mass function with Sheth-Torman correction for ellipsoidal collapse at
-     redshift z, and dark matter halo mass M (in solar masses).
-     
-     The return value is the number density per unit mass of halos in the mass range M to M+dM in units of:
-     comoving Mpc^-3 Msun^-1
-     
-     Reference: Sheth, Mo, Torman 2001
-     */
-    
-    double dNdM = -1;
-    
-    printf ("#Redshift - Mass [Msun] - dNdM [Mpc^-3 Msun^-1]\n");
-    
-    for (double M = M_min; M <= M_max; M *= 1.1){
-        dNdM = fast::dNdM_st(z,M);
-        printf ("%5.2e %5.2e %5.2e\n", z, M, dNdM);
-    }
-}
-
-double hmf_function (double M, void *params) {
-    double z = *(double *) params;
-    double dNdM = fast::dNdM_st(z, M / mass_sun) / pow3(Mpc) / mass_sun;
-    //printf ("%5.2e %5.2e %5.2e\n", z, M, dNdM);
-    return M * dNdM / free_fall_timescale(z, M);
-}
-
-double Reionization::integrate_hmf(double z, const double& M_min, const double& M_max) {
-    int KEYINTEGRAL = 2;
-    int LIMIT = 10000;
-    
-    gsl_integration_workspace * w
-    = gsl_integration_workspace_alloc (LIMIT);
-    
-    double result, error;
-    
-    gsl_function F;
-    F.function = &hmf_function;
-    F.params = &z;
-    
-    gsl_integration_qag (&F, M_min, M_max, 0, 1e-4, LIMIT, KEYINTEGRAL,
-                         w, &result, &error);
-    
-    //printf ("result          = % .8e\n", result);
-    //printf ("estimated error = % .8e\n", error);
-    
-    gsl_integration_workspace_free (w);
-    
-    return result;
 }

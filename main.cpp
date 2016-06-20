@@ -3,7 +3,7 @@
 // #include "TEvolve.h"
 
 #include "reionization.h"
-//#include "utilities.h"
+#include "SFR.h"
 
 using namespace std;
 
@@ -21,24 +21,33 @@ int main() {
 
     //cout << compute_spectrum_normalization(1. * GeV, 0.001 * GeV, 1e6 * GeV, 1e51 * erg, 2.2) << endl;
 
-
     //print_timescales("output/timescales_at_z10.txt", 10);
     
     //print_timescales("output/timescales_at_z20.txt", 20);
     
+    fast::init_ps();
+
+    SFR* S = new SFR("SFR.txt");
+    
+    //S->print_hmf(30, 1e6, 1e12);
+    
+    //S->evolve();
+    
+    delete S;
+    
     Reionization* R = new Reionization();
     
-    //R->print_hmf(30, 1e6, 1e12);
-    
-    //cout << R->integrate_hmf(30, min_star_forming_halo(30), 1e12) << "\n";
+    R->read_SFR("SFR.txt");
     
     R->init_reionization();
     
-    R->set_dz(0.01);
+    R->set_dz(1e-6);
     
     R->set_f_sfr(0.04);
     
-    R->set_f_lya(3e63 / mass_sun);
+    R->set_f_UV(4.5e60 / mass_sun);
+    
+    //R->hmf_integral_interpolate(19.03);
     
     R->evolve();
     

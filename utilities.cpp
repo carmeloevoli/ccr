@@ -149,3 +149,16 @@ double compute_spectrum_normalization(double E_0, double E_min, double E_max, do
     
     return result;
 }
+
+double compute_initial_tau(const double& init_redshift){
+    
+    double result = 0;
+    double dz = 0.1;
+    
+    for (double z = 1000; z > init_redshift; z -= dz) {
+        double dt = -fast::dtdz(z) * dz;
+        double n_e = 1e-4 * n_H_physical(z);
+        result += SIGMAT * n_e * c_light * dt;
+    }
+    return result;
+}

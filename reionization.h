@@ -12,12 +12,9 @@ public:
     void init_reionization();
     void evolve();
     void print_status(bool doTitle);
-    
-    void print_hmf(const double& z, const double& M_min, const double& M_max);
-    double integrate_hmf(double z, const double& M_min, const double& M_max);
-    double Galaxy_ionization_rate(const double& z);
-    double Galaxy_heating_rate(const double& z);
-    
+    void read_SFR(const string& filename);
+    double hmf_integral_interpolate(const double& z);
+
     inline void set_dz(const double& dz) {
         this->dz = dz;
     }
@@ -34,27 +31,31 @@ public:
         this->f_sfr = f_sfr;
     }
     
-    inline void set_f_lya(const double& f_lya) {
-        this->f_lya = f_lya;
+    inline void set_f_UV(const double& f_UV) {
+        this->f_UV = f_UV;
     }
     
 private:
+    double optical_depth_PLANCK;
     double z;
     double dz;
     double x_II;
     double T_k;
     double f_sfr;
-    double f_lya;
+    double f_UV;
     double clumping_factor;
-    double min_sfr_halo;
-    double hmf_integral;
     double ionization_rate;
     double recombination_rate;
+    double heating_rate;
     double star_formation_rate_comoving;
     double star_formation_rate_physical;
     double optical_depth;
     double sn_energy_rate;
     double cz;
+
+    vector<double> hmf_z;
+    vector<double> hmf_integral;
+    
 };
 
 #endif
