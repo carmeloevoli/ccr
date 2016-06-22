@@ -78,6 +78,17 @@ double n_H_physical(const double & z) {
     return n_H_0 * pow(1. + z, 3.);
 }
 
+double UV_mean_free_path(const double& z) {
+    //double measurement = 3.3;
+    //double lambda_ll = c_light / fast::hubble(z) / (1. + z) / measurement;
+    //return lambda_ll / sqrt(M_PI);
+    return 39. * Mpc * pow((1. + z) / 4., -5.5); // 4.5
+}
+
+double baryon_number(const double& z) {
+    return 0;
+}
+
 double spectrum(const double& E_k) {
     
     double normalization = 1;

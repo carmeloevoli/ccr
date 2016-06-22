@@ -35,4 +35,8 @@ double compute_spectrum_normalization(double E_0, double E_min, double E_max, do
 
 double compute_initial_tau(const double& init_redshift);
 
+double UV_mean_free_path(const double& z);
+
+double baryon_number(const double& z);
+
 #endif /* UTILITIES_H_ */

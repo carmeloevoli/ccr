@@ -31,8 +31,8 @@ public:
         this->f_sfr = f_sfr;
     }
     
-    inline void set_f_UV(const double& f_UV) {
-        this->f_UV = f_UV;
+    inline void set_f_esc(const double& f_esc) {
+        this->f_esc = f_esc;
     }
     
 private:
@@ -42,7 +42,7 @@ private:
     double x_II;
     double T_k;
     double f_sfr;
-    double f_UV;
+    double f_esc;
     double clumping_factor;
     double ionization_rate;
     double recombination_rate;

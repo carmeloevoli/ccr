@@ -4,7 +4,7 @@ Reionization::Reionization() {
     init_reionization();
     clumping_factor = 2.;
     f_sfr = 4e-2;
-    f_UV = 1e63 / mass_sun;
+    f_esc = 0.1;
     optical_depth_PLANCK = 0.055 + 3. * 0.009;
 }
 
@@ -12,7 +12,7 @@ Reionization::~Reionization() {}
 
 void Reionization::init_reionization() {
     x_II = 1e-4;
-    T_k = 1e0 * K;
+    T_k = 1e1 * K;
     z = initial_redshift;
     optical_depth = 0;
     heating_rate = 0;
@@ -43,6 +43,7 @@ double Reionization::hmf_integral_interpolate(const double& x) {
         cout << "z too large in interpolation!" << "\n";
         exit(1);
     }
+    
     size_t i = 0;
     bool found = false;
     vector<double>::iterator it = hmf_z.begin();
@@ -73,7 +74,11 @@ void Reionization::evolve() {
     
     print_status(true);
     
-    const double UV_photoionization_cs = 6.3e-18 / pow2(cm);
+    const double UV_photoionization_cs = 6.3e-18 * pow2(cm);
+    const double PopII_spectrum_slope = 5.;
+    const double PopII_dNdM = 8e60 / mass_sun;
+    const double A = (PopII_spectrum_slope - 1.) / (PopII_spectrum_slope + 0.5);
+    const double B = (PopII_spectrum_slope - 1.) / (pow2(PopII_spectrum_slope) - .25);
     
     double normalization_integral = compute_spectrum_normalization(reference_energy, SN_E_min, SN_E_max, SN_slope);
     
@@ -87,16 +92,17 @@ void Reionization::evolve() {
         
         star_formation_rate_comoving = f_sfr * Omega_b / (Omega_m - Omega_b) * hmf_integral_interpolate(z); // M V^-1 T^-1
         star_formation_rate_physical = star_formation_rate_comoving * pow3(1. + z); // M V^-1 T^-1
-        ionization_rate = c_light * UV_photoionization_cs * f_UV * (1. - x_II) * star_formation_rate_physical * fabs(dt); // T^-1
+        //ionization_rate = c_light * UV_photoionization_cs * f_UV * (1. - x_II) * star_formation_rate_physical * fabs(dt); // T^-1
+        ionization_rate = A * (1. - x_II) * UV_photoionization_cs * UV_mean_free_path(z) * f_esc *  PopII_dNdM * star_formation_rate_physical; // T^-1
         recombination_rate = fast::alpha_A(T_k) * clumping_factor * (1. + f_He) * n_H_physical(z) * pow2(x_II); // L^3 T^-1 L^-3
-        heating_rate = (13.6 * eV) * f_UV * star_formation_rate_physical / n_H_physical(z); // E / T
+        heating_rate = B * (13.6 * eV) * UV_photoionization_cs * UV_mean_free_path(z) * f_esc *  PopII_dNdM * star_formation_rate_physical * (1. - x_II); // E / T
         
         sn_energy_rate = SN_efficiency * SN_kinetic_energy * SN_fraction * star_formation_rate_physical; // E V^-1 T^-1
         cz = sn_energy_rate / pow2(reference_energy) / normalization_integral;
         
         dx_II = dt * (ionization_rate - recombination_rate); // cm^3 s^-1 cm^-3;
         
-        dT_k_dz = 2. * T_k / (1. + z) - T_k / (1. + x_II) * (dx_II / dz) + 2. / 3. / k_boltzmann / (1. + x_II) * fast::dtdz(z) * heating_rate;
+        dT_k_dz = 2. * T_k / (1. + z) - T_k / (1. + x_II) * (dx_II / dz) + 2. / 3. / k_boltzmann / (1. + x_II) * fast::dtdz(z) * heating_rate ;
         
         x_II -= dx_II;
         T_k -= dT_k_dz * dz;

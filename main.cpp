@@ -4,6 +4,7 @@
 
 #include "reionization.h"
 #include "SFR.h"
+#include "utilities.h"
 
 using namespace std;
 
@@ -27,6 +28,12 @@ int main() {
     
     fast::init_ps();
 
+    for (double z = 0; z < 30; z += 1) {
+        double l = UV_mean_free_path(z);
+        //cout << z << "\t" << l / Mpc << "\t" << c_light / sqrt(M_PI) / l / fast::hubble(z) / (1+z) << "\t" << 39. * pow((1. + z) / 4., -4.5) << "\n";
+    }
+
+
     SFR* S = new SFR("SFR.txt");
     
     //S->print_hmf(30, 1e6, 1e12);
@@ -45,7 +52,7 @@ int main() {
     
     R->set_f_sfr(0.04);
     
-    R->set_f_UV(4.5e60 / mass_sun);
+    R->set_f_esc(2e-4);
     
     //R->hmf_integral_interpolate(19.03);
     
