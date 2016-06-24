@@ -28,19 +28,19 @@ int main() {
     
     fast::init_ps();
 
-    for (double z = 0; z < 30; z += 1) {
-        double l = UV_mean_free_path(z);
+    //for (double z = 0; z < 30; z += 1) {
+    //    double l = UV_mean_free_path(z);
         //cout << z << "\t" << l / Mpc << "\t" << c_light / sqrt(M_PI) / l / fast::hubble(z) / (1+z) << "\t" << 39. * pow((1. + z) / 4., -4.5) << "\n";
-    }
+    //}
 
 
-    SFR* S = new SFR("SFR.txt");
+    //SFR* S = new SFR("SFR.txt");
     
     //S->print_hmf(30, 1e6, 1e12);
     
     //S->evolve();
     
-    delete S;
+    //delete S;
     
     Reionization* R = new Reionization();
     
@@ -48,14 +48,12 @@ int main() {
     
     R->init_reionization();
     
-    R->set_dz(1e-6);
+    R->set_dz(1e-5);
     
     R->set_f_sfr(0.04);
     
     R->set_f_esc(2e-4);
-    
-    //R->hmf_integral_interpolate(19.03);
-    
+        
     R->evolve();
     
     delete R;

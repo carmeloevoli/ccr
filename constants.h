@@ -128,6 +128,10 @@ static const double SN_fraction = 0.01 / mass_sun;
 static const double SN_E_min = 0.1 * GeV;
 static const double SN_E_max = 1e6 * GeV;
 static const double initial_redshift = 30.;
+static const double UV_photoionization_cs = 6.3e-18 * pow2(cm);
+static const double PopII_spectrum_slope = 5.;
+static const double PopII_dNdM = 8e60 / mass_sun;
+static const double clumping_factor = 2.;
 
 #include "cosmology_params.h"
 #include "anal_params.h"

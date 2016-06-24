@@ -60,6 +60,10 @@ double fragmentation_timescale(const double& n_H) {
     return 6e7 * year / n_H; // arXiv:1208.4979
 }
 
+double hubble_time(const double& z) {
+    return 2./5./H_0/sqrt(Omega_m) * pow(1. + z, -2.5);
+}
+
 double free_fall_timescale(const double& z, const double& halo_mass) {
     
     double virial_radius_comoving = fast::MtoRvir(z, halo_mass / mass_sun) * Mpc; // M in M_sun, Rvir in comoving Mpc

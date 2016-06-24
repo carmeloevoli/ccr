@@ -11,6 +11,8 @@ public:
     
     void init_reionization();
     void evolve();
+    void evolve_CR(const double& dt);
+    void evolve_IGM(const double& dt);
     void print_status(bool doTitle);
     void read_SFR(const string& filename);
     double hmf_integral_interpolate(const double& z);
@@ -40,10 +42,12 @@ private:
     double z;
     double dz;
     double x_II;
+    double n_H;
+    double n_e;
+    double n_n;
     double T_k;
     double f_sfr;
     double f_esc;
-    double clumping_factor;
     double ionization_rate;
     double recombination_rate;
     double heating_rate;
@@ -52,10 +56,10 @@ private:
     double optical_depth;
     double sn_energy_rate;
     double cz;
+    double normalization_integral;
 
     vector<double> hmf_z;
     vector<double> hmf_integral;
-    
 };
 
 #endif

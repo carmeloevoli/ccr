@@ -39,4 +39,6 @@ double UV_mean_free_path(const double& z);
 
 double baryon_number(const double& z);
 
+double hubble_time(const double& z);
+
 #endif /* UTILITIES_H_ */
