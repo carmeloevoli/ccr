@@ -5,7 +5,7 @@
 
 double dEdt_ionization(const double& n_HI, const double& E_k) {
     
-    double p_squared = (pow2(gamma(E_k)) - 1.);
+    double p_squared = pow2(gamma(E_k)) - 1.;
     
     double beta_squared = pow2(beta(E_k));
     
@@ -61,7 +61,7 @@ double fragmentation_timescale(const double& n_H) {
 }
 
 double hubble_time(const double& z) {
-    return 2./5./H_0/sqrt(Omega_m) * pow(1. + z, -2.5);
+    return 2. / 3. / H_0 / sqrt(Omega_m) * pow(1. + z, -1.5);
 }
 
 double free_fall_timescale(const double& z, const double& halo_mass) {

@@ -2,11 +2,22 @@
 
 Reionization::Reionization() {
     init_reionization();
+    init_grids();
     f_sfr = 4e-2;
     f_esc = 0.1;
 }
 
 Reionization::~Reionization() {}
+
+void Reionization::init_grids() {
+    double deltaLogE = exp(log(SN_E_max / SN_E_min) / (E_size - 1));
+    for (size_t iE = 0; iE < E_size; ++iE) {
+        E_k.push_back(exp(log(SN_E_min) + iE * log(deltaLogE)));
+    }
+    Q_SN.resize(E_size, 0.);
+    b_losses.resize(E_size, 0.);
+}
+
 
 void Reionization::init_reionization() {
     x_II = 1e-4;
@@ -71,7 +82,7 @@ void Reionization::evolve_IGM(const double& dt) {
     
     n_H = n_H_physical(z);
     n_e =  x_II * (1. + f_He) * n_H;
-    n_n = (1. - x_II) * (1. + f_He) * n_H;
+    n_HI = (1. - x_II) * n_H;
     
     star_formation_rate_comoving = f_sfr * Omega_b / (Omega_m - Omega_b) * hmf_integral_interpolate(z); // M V^-1 T^-1
     star_formation_rate_physical = star_formation_rate_comoving * pow3(1. + z); // M V^-1 T^-1
@@ -94,7 +105,7 @@ void Reionization::evolve_CR(const double& dt) {
     sn_energy_rate = SN_efficiency * SN_kinetic_energy * SN_fraction * star_formation_rate_physical; // E V^-1 T^-1
     cz = sn_energy_rate / pow2(reference_energy) / normalization_integral;
     
-    //vector<double> Q(p);
+    
     
     return;
 }
@@ -116,7 +127,7 @@ void Reionization::evolve() {
         evolve_CR(dt);
         
         z -= dz;
-
+        
         if (counter % 100000 == 0)
             print_status(false);
     }
@@ -133,12 +144,12 @@ void Reionization::print_status(bool doTitle) {
         cout << T_k << "\t";
         cout << optical_depth << "\t";
         //cout << optical_depth_PLANCK << "\t";
-        double E_k = 10. * GeV;
-        cout << (E_k / dEdt_ionization(1e-7, E_k)) / Gyr << "\t";
-        cout << (E_k / dEdt_coulomb(1e-7, E_k)) / Gyr << "\t";
-        E_k = 100. * GeV;
-        cout << (E_k / dEdt_ionization(1e-7, E_k)) / Gyr << "\t";
-        cout << (E_k / dEdt_coulomb(1e-7, E_k)) / Gyr << "\t";
+        double E_k = 1. * MeV;
+        cout << (E_k / dEdt_ionization(n_HI, E_k)) / Gyr << "\t";
+        cout << (E_k / dEdt_coulomb(n_e, E_k)) / Gyr << "\t";
+        E_k = 10. * MeV;
+        cout << (E_k / dEdt_ionization(n_HI, E_k)) / Gyr << "\t";
+        cout << (E_k / dEdt_coulomb(n_e, E_k)) / Gyr << "\t";
         cout << hubble_time(z) / Gyr << "\t";
         //cout << fast::t_hubble(z) / Gyr << "\t";
         //cout << min_sfr_halo / mass_sun << "\t";

@@ -48,7 +48,7 @@ int main() {
     
     R->init_reionization();
     
-    R->set_dz(1e-5);
+    R->set_dz(1e-6);
     
     R->set_f_sfr(0.04);
     

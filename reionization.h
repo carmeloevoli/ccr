@@ -10,6 +10,7 @@ public:
     ~Reionization();
     
     void init_reionization();
+    void init_grids();
     void evolve();
     void evolve_CR(const double& dt);
     void evolve_IGM(const double& dt);
@@ -43,8 +44,8 @@ private:
     double dz;
     double x_II;
     double n_H;
+    double n_HI;
     double n_e;
-    double n_n;
     double T_k;
     double f_sfr;
     double f_esc;
@@ -60,6 +61,10 @@ private:
 
     vector<double> hmf_z;
     vector<double> hmf_integral;
+    
+    vector<double> E_k;
+    vector<double> Q_SN;
+    vector<double> b_losses;
 };
 
 #endif
