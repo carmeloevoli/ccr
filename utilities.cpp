@@ -50,6 +50,11 @@ double dEdt_coulomb_Galprop(const double& n_e, const double& E_k) {
     return 4. * pi_re2_me_c2_c * n_e * Coulomb_log * (beta_2 / (x_m_3 + beta_3));
 }
 
+double dEdt_pp(const double& n_H, const double& E_k) {
+    double n = n_H * (1. + f_He);
+    return 3.85e-16 * GeV / s * (n * pow3(cm)) * pow(E_k / GeV, 1.28) * pow(E_k / GeV + 200., -0.2);
+}
+
 double dEdt_adiabatic(const double& z, const double& E_k) {
     const double dzdt = 1. / fast::dtdz(z);
     

@@ -4,7 +4,7 @@ namespace fast {
     
     /* dynamical time at z in seconds */
     float t_dynamical(float z){
-        return sqrt(3*PI/16.0) / sqrt(G * Deltac_nonlinear(z) * rho_critz(z) * Msun / (CMperMPC*CMperMPC*CMperMPC));
+        return sqrt(3.*M_PI/16.0) / sqrt(G * Deltac_nonlinear(z) * rho_critz(z) * Msun / (CMperMPC*CMperMPC*CMperMPC));
     }
     
     /* helper function defined in Barkana 2002 */
@@ -50,7 +50,7 @@ namespace fast {
     
     /* returns the proper mean baryonic density at z in g/cm^3 */
     double mean_rho(float z){
-        return OMb*(3.0*Ho*Ho / (8.0*PI*G)) * pow(1+z, 3);
+        return OMb*(3.0*Ho*Ho / (8.0*M_PI*G)) * pow(1+z, 3);
     }
     
     /* returns the gas temperature assuming adiabatic cooling after instantaneous CMB decoupling */
@@ -140,7 +140,7 @@ namespace fast {
     double alpha_A(double T){
         double logT, ans;
         logT = log(T/(double)1.1604505e4);
-        ans = pow(E, -28.6130338 - 0.72411256*logT - 2.02604473e-2*pow(logT, 2)
+        ans = pow(EULER, -28.6130338 - 0.72411256*logT - 2.02604473e-2*pow(logT, 2)
                   - 2.38086188e-3*pow(logT, 3) - 3.21260521e-4*pow(logT, 4)
                   - 1.42150291e-5*pow(logT, 5) + 4.98910892e-6*pow(logT, 6)
                   + 5.75561414e-7*pow(logT, 7) - 1.85676704e-8*pow(logT, 8)
@@ -182,14 +182,14 @@ namespace fast {
     /* returns V in km/s
      from Barkana & Loeb 2000 */
     float MtoVcir(float z, double M){
-        return 23.4 * pow(M*hlittle/1.0e8, 1.0/3.0) * pow(OMm*Deltac_nonlinear(z)/(omega_mz(z)*18*PI*PI), 1.0/6.0) * sqrt((1+z)/10.0);
+        return 23.4 * pow(M*hlittle/1.0e8, 1.0/3.0) * pow(OMm*Deltac_nonlinear(z)/(omega_mz(z)*18*M_PI*M_PI), 1.0/6.0) * sqrt((1+z)/10.0);
     }
     
     
     /* returns Rvir in comoving Mpc
      from Barkana & Loeb 2000 */
     float MtoRvir(float z, double M){
-        return 0.00784/hlittle * pow(M*hlittle/1.0e8, 1.0/3.0) * pow(OMm*Deltac_nonlinear(z)/(omega_mz(z)*18*PI*PI), -1.0/3.0);
+        return 0.00784/hlittle * pow(M*hlittle/1.0e8, 1.0/3.0) * pow(OMm*Deltac_nonlinear(z)/(omega_mz(z)*18*M_PI*M_PI), -1.0/3.0);
     }
     
     
@@ -207,7 +207,7 @@ namespace fast {
     double Deltac_nonlinear(float z){
         double d;
         d = omega_mz(z) - 1.0;
-        return 18*PI*PI + 82*d - 39*d*d;
+        return 18*M_PI*M_PI + 82*d - 39*d*d;
     }
     
     
@@ -221,13 +221,13 @@ namespace fast {
     double dVdz(float z){
         double d;
         d = d_L(z);
-        return 4*PI*d*d*C*fabs(dtdz(z)) / (1+z) / CMperMPC;
+        return 4*M_PI*d*d*C_LIGHT*fabs(dtdz(z)) / (1+z) / CMperMPC;
     }
     
     
     /* arcmin to comoving Mpc */
     double arcmintoMpc(float z, float arcmin){
-        return (1+z)*d_A(z)*arcmin*PI/180.0/60.0;
+        return (1+z)*d_A(z)*arcmin*M_PI/180.0/60.0;
     }
     
     /* angular diameter distance (proper Mpc) */
@@ -253,7 +253,7 @@ namespace fast {
                              1000, GSL_INTEG_GAUSS61, w, &result, &error);
         gsl_integration_workspace_free (w);
         
-        return C * (1+z) * result / CMperMPC;
+        return C_LIGHT * (1+z) * result / CMperMPC;
     }
     
     
@@ -354,12 +354,12 @@ namespace fast {
     
     /* comoving distance (in cm) per unit redshift */
     double drdz(float z){
-        return (1.0+z)*C*dtdz(z);
+        return (1.0+z)*C_LIGHT*dtdz(z);
     }
     
     /* Returns the proper distance (in cm) traved by photon (i.e. length of a null geodesic) from zsource to z */
     double properdistance(double z, double zsource){
-        return C*timesince(z, zsource);
+        return C_LIGHT*timesince(z, zsource);
     }
     
     
@@ -583,9 +583,9 @@ namespace fast {
         if (nu == HeII_NUIONIZATION)
             nu+=TINY;
         
-        epsilon = sqrt( nu/HeII_NUIONIZATION - 1);
+        epsilon = sqrt(nu/HeII_NUIONIZATION - 1);
         return (6.3e-18)/Z/Z * pow(HeII_NUIONIZATION/nu, 4)
-        * pow(E, 4-(4*atan(epsilon)/epsilon)) / (1-pow(E, -2*PI/epsilon));
+        * pow(EULER, 4-(4*atan(epsilon)/epsilon)) / (1-pow(EULER, -2.*M_PI/epsilon));
     }
     
     
@@ -602,7 +602,7 @@ namespace fast {
         
         epsilon = sqrt( nu/NUIONIZATION - 1);
         return (6.3e-18)/Z/Z * pow(NUIONIZATION/nu, 4)
-        * pow(E, 4-(4*atan(epsilon)/epsilon)) / (1-pow(E, -2*PI/epsilon));
+        * pow(EULER, 4-(4*atan(epsilon)/epsilon)) / (1-pow(EULER, -2.*M_PI/epsilon));
     }
     
 } /* namespace */

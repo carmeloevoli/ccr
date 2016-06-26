@@ -61,17 +61,17 @@ using namespace std;
 /* CONSTANTS */
 #define LN10 (double) (2.30258509299)
 #define SIGMAT (double) (6.6524e-25)  /* Thomson scattering cross section in cm^-2 */
-#define E (double) (2.71828182846)
-#define PI (double) (3.14159265358979323846264338327)
-#define TWOPI (double) (2.0*PI)
-#define FOURPI (double) (4.0*PI)
+#define EULER (double) (2.71828182846)
+//#define PI (double) (3.14159265358979323846264338327)
+#define TWOPI (double) (2.0*M_PI)
+#define FOURPI (double) (4.0*M_PI)
 //#define G (double) 6.67259e-8 /* cm^3 g^-1 s^-2*/
 #define hplank (double) 6.62606896e-27 /* erg s */
 #define TINY (double) 1e-30
 #define FRACT_FLOAT_ERR (double) 1e-7 /* fractional floating point error */
 #define f_alpha (float) 0.4162 /* oscillator strength of Lya */
 #define Ly_alpha_HZ  (double ) 2.46606727e15  /* frequency of Lyalpha */ 
-#define C  (double) 29979245800.0  /*  speed of light  (cm/s)  */
+#define C_LIGHT  (double) 29979245800.0  /*  speed of light  (cm/s)  */
 #define alphaA_10k (double) 4.18e-13 /* taken from osterbrock for T=10000 */
 #define alphaB_10k (double) 2.59e-13 /* taken from osterbrock for T=10000 */
 #define alphaB_20k (double) 2.52e-13 /* taken from osterbrock for T=20000 */
@@ -89,15 +89,15 @@ using namespace std;
 #define m_p (double) 1.6726231e-24 /* proton mass (g) */
 #define m_e (double) 9.10938188e-28 /* electron mass (g) */
 #define e_charge (double) 4.8033e-10 /* elemetary charge (esu=g^1/2 cm^3/2 s^-1*/ 
-#define SQDEG_ALLSKY (double) ((360.0*360.0)/PI) /* Square degrees in all sky */
+#define SQDEG_ALLSKY (double) ((360.0*360.0) / M_PI) /* Square degrees in all sky */
 #define G_AB_Jy (double) 3631.0 /* AB mag constant in Jy */ 
 #define NU_over_EV (double) (1.60217646e-12 / hplank)
 #define NUIONIZATION (double) (13.60*NU_over_EV)  /* ionization frequency of H */ 
 #define HeII_NUIONIZATION (double) (NUIONIZATION*4) /* ionization frequency of HeII */
 #define HeI_NUIONIZATION (double) (24.59*NU_over_EV) /* ionization frequency of HeI */
 #define Ho  (double) (hlittle*3.2407e-18) /* s^-1 at z=0 */
-#define RHOcrit (double) ( (3.0*Ho*Ho / (8.0*PI*G)) * (CMperMPC*CMperMPC*CMperMPC)/Msun) /* Msun Mpc^-3 */ /* at z=0 */
-#define RHOcrit_cgs (double) (3.0*Ho*Ho / (8.0*PI*G)) /* g pcm^-3 */ /* at z=0 */
+#define RHOcrit (double) ( (3.0*Ho*Ho / (8.0*M_PI*G)) * (CMperMPC*CMperMPC*CMperMPC)/Msun) /* Msun Mpc^-3 */ /* at z=0 */
+#define RHOcrit_cgs (double) (3.0*Ho*Ho / (8.0*M_PI*G)) /* g pcm^-3 */ /* at z=0 */
 #define No  (double) (RHOcrit_cgs*OMb*(1-Y_He)/m_p)  /*  current hydrogen number density estimate  (#/cm^3)  ~1.92e-7*/
 #define He_No (double) (RHOcrit_cgs*OMb*Y_He/(4.0*m_p)) /*  current helium number density estimate */
 #define N_b0 (double) (No+He_No) /* present-day baryon num density, H + He */

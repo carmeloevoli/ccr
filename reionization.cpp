@@ -1,25 +1,37 @@
 #include "reionization.h"
 
-Reionization::Reionization() {
+Reionization::Reionization(const string& init_filename_) {
+    init_filename = init_filename_;
     init_reionization();
     init_grids();
     f_sfr = 4e-2;
     f_esc = 0.1;
+    open_output_files();
 }
 
-Reionization::~Reionization() {}
+Reionization::~Reionization() {
+    close_output_files();
+}
 
 void Reionization::init_grids() {
+    cout << "Init energ grids ...\n";
     double deltaLogE = exp(log(SN_E_max / SN_E_min) / (E_size - 1));
     for (size_t iE = 0; iE < E_size; ++iE) {
-        E_k.push_back(exp(log(SN_E_min) + iE * log(deltaLogE)));
+        double E_k_ = exp(log(SN_E_min) + iE * log(deltaLogE));
+        E_k.push_back(E_k_);
+        Q_sn.push_back(spectrum(E_k_));
     }
-    Q_SN.resize(E_size, 0.);
-    b_losses.resize(E_size, 0.);
+    b_losses.resize(E_size);
+    N_cr.resize(E_size);
+    knownTerm.resize(E_size - 1);
+    diagonal.resize(E_size - 1);
+    upperDiagonal.resize(E_size - 2);
+    lowerDiagonal.resize(E_size - 2);
+    N_next.resize(E_size - 1);
 }
 
-
 void Reionization::init_reionization() {
+    cout << "Init reionization parameters ...\n";
     x_II = 1e-4;
     T_k = 1e1 * K;
     z = initial_redshift;
@@ -33,19 +45,27 @@ void Reionization::init_reionization() {
 }
 
 void Reionization::read_SFR(const string& filename) {
+    cout << "Reading SFR from file " << filename << " ...\n";
     ifstream file_to_read(filename.c_str());
     const int num_of_header_lines = 1;
     
-    for (int i = 0; i < num_of_header_lines; ++i)
-        file_to_read.ignore(512, '\n');
-    
-    while(!file_to_read.eof()) {
-        double x, y1, y2;
-        file_to_read >> x >> y1 >> y2;
-        if (!file_to_read.eof()) {
-            hmf_z.push_back(x);
-            hmf_integral.push_back(y2);
+    if (file_to_read) {
+        for (int i = 0; i < num_of_header_lines; ++i)
+            file_to_read.ignore(512, '\n');
+        
+        while(!file_to_read.eof()) {
+            double x, y1, y2;
+            file_to_read >> x >> y1 >> y2;
+            if (!file_to_read.eof()) {
+                hmf_z.push_back(x);
+                hmf_integral.push_back(y2);
+            }
         }
+        file_to_read.close();
+    }
+    else {
+        cout << "File " << filename << " does not exist!\n";
+        exit(1);
     }
     //cout << "HMF vector size = " << hmf_z.size() << endl;
 }
@@ -101,16 +121,50 @@ void Reionization::evolve_IGM(const double& dt) {
     return;
 }
 
+void Reionization::build_losses() {
+    for (size_t iE = 0; iE < E_size; ++iE) {
+        double E_k_iE = E_k.at(iE);
+        double dEdt = dEdt_adiabatic(z, E_k_iE);
+        dEdt += dEdt_ionization(n_HI, E_k_iE);
+        dEdt += dEdt_coulomb(n_e, E_k_iE);
+        dEdt += dEdt_pp(n_H, E_k_iE);
+        b_losses.at(iE) = 0.0;//-dEdt;
+    }
+}
+
 void Reionization::evolve_CR(const double& dt) {
     sn_energy_rate = SN_efficiency * SN_kinetic_energy * SN_fraction * star_formation_rate_physical; // E V^-1 T^-1
     cz = sn_energy_rate / pow2(reference_energy) / normalization_integral;
     
+    build_losses();
     
+    for (size_t iE = 0; iE < E_size - 1; ++iE) {
+        double alpha2 = - fabs(dt) * b_losses.at(iE) / (E_k.at(iE+1) - E_k.at(iE));
+        double alpha3 = - fabs(dt) * b_losses.at(iE+1) / (E_k.at(iE+1) - E_k.at(iE));
+        diagonal.at(iE) = .5 * (1. + alpha2);
+        if (iE != E_size - 2)
+            upperDiagonal.at(iE) = .5 * (1. - alpha3);
+        if (iE != 0)
+            lowerDiagonal.at(iE - 1) = 0;
+        knownTerm.at(iE) = .5 * (1. - alpha2) * N_cr.at(iE);
+        knownTerm.at(iE) += .5 * (1. + alpha3) * N_cr.at(iE + 1);
+        knownTerm.at(iE) += .5 * fabs(dt) * cz * (Q_sn.at(iE + 1) + Q_sn.at(iE));
+    }
     
-    return;
+    gsl_linalg_solve_tridiag(diagonal, upperDiagonal, lowerDiagonal, knownTerm, N_next);
+    
+    for (size_t iE = 0; iE < E_size - 1; ++iE) {
+        N_cr.at(iE) = max(N_next.at(iE), 0.);
+    }
+    
+    //cout << dt << "\t" << *min_element(N_cr.begin(),N_cr.end()) << "\t" << *max_element(N_cr.begin(),N_cr.end()) << "\n";
+    
+    return; //max_difference;
 }
 
 void Reionization::evolve() {
+    
+    cout << "Begin solver ...\n";
     
     size_t counter = 0;
     
@@ -128,37 +182,10 @@ void Reionization::evolve() {
         
         z -= dz;
         
-        if (counter % 100000 == 0)
+        if (counter % (int)(1./dz) == 0) {
             print_status(false);
+            dump_N(z);
+        }
     }
-}
-
-void Reionization::print_status(bool doTitle) {
-    if (doTitle) {
-        cout << "#z - x_e - T_k [K] - optical_depth - min_sfr_halo [M_sun] - halo_integral [M_sun Mpc^-3 yr^-1] - SFR [M_sun Mpc^-3 yr^-1] - Ion Rate [Myr^-1] - Rec Rate [Myr^-1]" << "\n";
-    }
-    else if (z > 0) {
-        cout << scientific << setprecision(3);
-        cout << z << "\t";
-        cout << x_II << "\t";
-        cout << T_k << "\t";
-        cout << optical_depth << "\t";
-        //cout << optical_depth_PLANCK << "\t";
-        double E_k = 1. * MeV;
-        cout << (E_k / dEdt_ionization(n_HI, E_k)) / Gyr << "\t";
-        cout << (E_k / dEdt_coulomb(n_e, E_k)) / Gyr << "\t";
-        E_k = 10. * MeV;
-        cout << (E_k / dEdt_ionization(n_HI, E_k)) / Gyr << "\t";
-        cout << (E_k / dEdt_coulomb(n_e, E_k)) / Gyr << "\t";
-        cout << hubble_time(z) / Gyr << "\t";
-        //cout << fast::t_hubble(z) / Gyr << "\t";
-        //cout << min_sfr_halo / mass_sun << "\t";
-        //cout << hmf_integral / (mass_sun / pow3(Mpc) / year) << "\t";
-        cout << star_formation_rate_comoving / (mass_sun / pow3(Mpc) / year) << "\t";
-        cout << sn_energy_rate / (erg / pow3(cm) / s) << "\t";
-        cout << cz / (1. / erg / pow3(cm) / s) << "\t";
-        cout << ionization_rate / (1. / Myr) << "\t";
-        cout << recombination_rate / (1. / Myr) << "\t";
-        cout << "\n";
-    }
+    cout << "... end in " << 1 << " s.\n";
 }

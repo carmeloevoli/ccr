@@ -13,9 +13,11 @@
 
 using namespace std;
 
-double dEdt_ionization(const double& n_H, const double& E_k);
+double dEdt_ionization(const double& n_HI, const double& E_k);
 
 double dEdt_coulomb(const double& n_e, const double& E_k);
+
+double dEdt_pp(const double& n_H, const double& E_k);
 
 double dEdt_coulomb_Galprop(const double& n_e, const double& E_k);
 
@@ -30,6 +32,8 @@ void print_timescales(string filename, const double& z);
 double min_star_forming_halo(const double& z);
 
 double free_fall_timescale(const double& z, const double& M);
+
+double spectrum(const double& E_k);
 
 double compute_spectrum_normalization(double E_0, double E_min, double E_max, double alpha);
 

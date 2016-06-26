@@ -33,7 +33,6 @@ int main() {
         //cout << z << "\t" << l / Mpc << "\t" << c_light / sqrt(M_PI) / l / fast::hubble(z) / (1+z) << "\t" << 39. * pow((1. + z) / 4., -4.5) << "\n";
     //}
 
-
     //SFR* S = new SFR("SFR.txt");
     
     //S->print_hmf(30, 1e6, 1e12);
@@ -42,7 +41,7 @@ int main() {
     
     //delete S;
     
-    Reionization* R = new Reionization();
+    Reionization* R = new Reionization("test_no");
     
     R->read_SFR("SFR.txt");
     

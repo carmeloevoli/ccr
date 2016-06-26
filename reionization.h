@@ -1,12 +1,16 @@
 #ifndef REIONIZATION_H_
 #define REIONIZATION_H_
 
+#include <iostream>
+#include <sstream>
+
 #include "ps.h"
+#include "tridiag.h"
 #include "utilities.h"
 
 class Reionization {
 public:
-    Reionization();
+    Reionization(const string& init_filename_);
     ~Reionization();
     
     void init_reionization();
@@ -14,10 +18,15 @@ public:
     void evolve();
     void evolve_CR(const double& dt);
     void evolve_IGM(const double& dt);
+    void build_losses();
+
     void print_status(bool doTitle);
+    void dump_N(const double& z);
+    void open_output_files();
+    void close_output_files();
     void read_SFR(const string& filename);
     double hmf_integral_interpolate(const double& z);
-
+    
     inline void set_dz(const double& dz) {
         this->dz = dz;
     }
@@ -58,13 +67,25 @@ private:
     double sn_energy_rate;
     double cz;
     double normalization_integral;
-
+    
     vector<double> hmf_z;
     vector<double> hmf_integral;
     
     vector<double> E_k;
-    vector<double> Q_SN;
+    vector<double> Q_sn;
     vector<double> b_losses;
+    vector<double> N_cr;
+    
+    vector<double> knownTerm;
+    vector<double> diagonal;
+    vector<double> upperDiagonal;
+    vector<double> lowerDiagonal;
+    vector<double> N_next;
+    
+    string init_filename;
+    
+    ofstream fout_losses;
+    ofstream fout_igm;
 };
 
 #endif

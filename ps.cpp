@@ -101,9 +101,9 @@ namespace fast {
     double RtoM(double R){
         // set M according to M<->R conversion defined by the filter type in ../Parameter_files/COSMOLOGY.H
         if (FILTER == 0) //top hat M = (4/3) PI <rho> R^3
-            return (4.0/3.0)*PI*pow(R,3)*(OMm*RHOcrit);
+            return (4.0/3.0)*M_PI*pow(R,3)*(OMm*RHOcrit);
         else if (FILTER == 1) //gaussian: M = (2PI)^1.5 <rho> R^3
-            return pow(2*PI, 1.5) * OMm*RHOcrit * pow(R, 3);
+            return pow(2.*M_PI, 1.5) * OMm*RHOcrit * pow(R, 3);
         else // filter not defined
             fprintf(stderr, "No such filter = %i.\nResults are bogus.\n", FILTER);
         return -1;
@@ -113,9 +113,9 @@ namespace fast {
     double MtoR(double M){
         // set R according to M<->R conversion defined by the filter type in ../Parameter_files/COSMOLOGY.H
         if (FILTER == 0) //top hat M = (4/3) PI <rho> R^3
-            return pow(3*M/(4*PI*OMm*RHOcrit), 1.0/3.0);
+            return pow(3*M/(4.*M_PI*OMm*RHOcrit), 1.0/3.0);
         else if (FILTER == 1) //gaussian: M = (2PI)^1.5 <rho> R^3
-            return pow( M/(pow(2*PI, 1.5) * OMm * RHOcrit), 1.0/3.0 );
+            return pow( M/(pow(2.*M_PI, 1.5) * OMm * RHOcrit), 1.0/3.0 );
         else // filter not defined
             fprintf(stderr, "No such filter = %i.\nResults are bogus.\n", FILTER);
         return -1;
@@ -127,7 +127,7 @@ namespace fast {
         if (del < 0){  fprintf(stderr, "ERROR:  In function f_jenkins del_o must be less than del_1 = del_crit/dicke(z)!\nAborting...\n"); return 0; }
         
         //  fprintf(stderr, "%f\t%f\n", del, sqrt(sigsq));
-        return sqrt(2/PI) * del/sqrt(sigsq) * pow(E, -0.5*del*del/sigsq);
+        return sqrt(2./M_PI) * del/sqrt(sigsq) * pow(EULER, -0.5*del*del/sigsq);
     }
     
     
@@ -154,7 +154,7 @@ namespace fast {
         sig_o = sigma_z0(M_o);
         sig_one = sigma_z0(M);
         sigsq = sig_one*sig_one - sig_o*sig_o;
-        return -(RHOcrit*OMm)/M /sqrt(2*PI) *del*pow(sigsq,-1.5)*pow(E, -0.5*del*del/sigsq)*dsigmasqdm_z0(M);
+        return -(RHOcrit*OMm)/M/sqrt(2*M_PI)*del*pow(sigsq,-1.5)*pow(EULER, -0.5*del*del/sigsq)*dsigmasqdm_z0(M);
     }
     
     
@@ -176,7 +176,7 @@ namespace fast {
         dsigmadm = dsigmasqdm_z0(M) * dicke_growth*dicke_growth/(2.0*sigma);
         nuhat = sqrt(SHETH_a) * Deltac / sigma;
         
-        return (-OMm*RHOcrit/M) * (dsigmadm/sigma) * sqrt(2/PI)*SHETH_A * (1+ pow(nuhat, -2*SHETH_p)) * nuhat * pow(E, -nuhat*nuhat/2.0);
+        return (-OMm*RHOcrit/M) * (dsigmadm/sigma) * sqrt(2/M_PI)*SHETH_A * (1+ pow(nuhat, -2*SHETH_p)) * nuhat * pow(EULER, -nuhat*nuhat/2.0);
     }
     
     
@@ -198,7 +198,7 @@ namespace fast {
         sigma = sigma_z0(M) * dicke_growth;
         dsigmadm = dsigmasqdm_z0(M) * (dicke_growth*dicke_growth/(2*sigma));
         
-        return (-OMm*RHOcrit/M) * sqrt(2/PI) * (Deltac/(sigma*sigma)) * dsigmadm * pow(E, -(Deltac*Deltac)/(2*sigma*sigma));
+        return (-OMm*RHOcrit/M) * sqrt(2/M_PI) * (Deltac/(sigma*sigma)) * dsigmadm * pow(EULER, -(Deltac*Deltac)/(2*sigma*sigma));
     }
     
     
@@ -398,7 +398,7 @@ namespace fast {
             p = pow(k, POWER_INDEX) * T * T;
         }
         else if (POWER_SPECTRUM == 1){ // BBKS
-            gamma = OMm * hlittle * pow(E, -OMb - OMb/OMm);
+            gamma = OMm * hlittle * pow(EULER, -OMb - OMb/OMm);
             q = k / (hlittle*gamma);
             T = (log(1.0+2.34*q)/(2.34*q)) *
             pow( 1.0+3.89*q + pow(16.1*q, 2) + pow( 5.46*q, 3) + pow(6.71*q, 4), -0.25);
@@ -412,13 +412,13 @@ namespace fast {
             p = pow(k, POWER_INDEX) / pow( 1+pow( aa*k + pow(bb*k, 1.5) + pow(cc*k,2), 1.13), 2.0/1.13 );
         }
         else if (POWER_SPECTRUM == 3){ // Peebles, pg. 626
-            gamma = OMm * hlittle * pow(E, -OMb - OMb/OMm);
+            gamma = OMm * hlittle * pow(EULER, -OMb - OMb/OMm);
             aa = 8.0 / (hlittle*gamma);
             bb = 4.7 / pow(hlittle*gamma, 2);
             p = pow(k, POWER_INDEX) / pow(1 + aa*k + bb*k*k, 2);
         }
         else if (POWER_SPECTRUM == 4){ // White, SDM and Frenk, CS, 1991, 379, 52
-            gamma = OMm * hlittle * pow(E, -OMb - OMb/OMm);
+            gamma = OMm * hlittle * pow(EULER, -OMb - OMb/OMm);
             aa = 1.7/(hlittle*gamma);
             bb = 9.0/pow(hlittle*gamma, 1.5);
             cc = 1.0/pow(hlittle*gamma, 2);
@@ -438,7 +438,7 @@ namespace fast {
             else { w = 3.0 * (sin(kR)/pow(kR, 3) - cos(kR)/pow(kR, 2));}
         }
         else if (FILTER == 1){ // gaussian of width 1/R
-            w = pow(E, -kR*kR/2.0);
+            w = pow(EULER, -kR*kR/2.0);
         }
         else {
             fprintf(stderr, "No such filter: %i\nOutput is bogus.\n", FILTER);
@@ -488,7 +488,7 @@ namespace fast {
             //p = pow(k, POWER_INDEX - 0.05*log(k/0.05)) * T * T; //running, alpha=0.05
         }
         else if (POWER_SPECTRUM == 1){ // BBKS
-            gamma = OMm * hlittle * pow(E, -OMb - OMb/OMm);
+            gamma = OMm * hlittle * pow(EULER, -OMb - OMb/OMm);
             q = k / (hlittle*gamma);
             T = (log(1.0+2.34*q)/(2.34*q)) *
             pow( 1.0+3.89*q + pow(16.1*q, 2) + pow( 5.46*q, 3) + pow(6.71*q, 4), -0.25);
@@ -502,13 +502,13 @@ namespace fast {
             p = pow(k, POWER_INDEX) / pow( 1+pow( aa*k + pow(bb*k, 1.5) + pow(cc*k,2), 1.13), 2.0/1.13 );
         }
         else if (POWER_SPECTRUM == 3){ // Peebles, pg. 626
-            gamma = OMm * hlittle * pow(E, -OMb - OMb/OMm);
+            gamma = OMm * hlittle * pow(EULER, -OMb - OMb/OMm);
             aa = 8.0 / (hlittle*gamma);
             bb = 4.7 / pow(hlittle*gamma, 2);
             p = pow(k, POWER_INDEX) / pow(1 + aa*k + bb*k*k, 2);
         }
         else if (POWER_SPECTRUM == 4){ // White, SDM and Frenk, CS, 1991, 379, 52
-            gamma = OMm * hlittle * pow(E, -OMb - OMb/OMm);
+            gamma = OMm * hlittle * pow(EULER, -OMb - OMb/OMm);
             aa = 1.7/(hlittle*gamma);
             bb = 9.0/pow(hlittle*gamma, 1.5);
             cc = 1.0/pow(hlittle*gamma, 2);
@@ -520,7 +520,7 @@ namespace fast {
         }
         
         
-        return p*TWOPI*PI*sigma_norm*sigma_norm;
+        return p*TWOPI*M_PI*sigma_norm*sigma_norm;
     }
     
     
@@ -540,7 +540,7 @@ namespace fast {
             //p = pow(k, POWER_INDEX - 0.05*log(k/0.05)) * T * T; //running, alpha=0.05
         }
         else if (POWER_SPECTRUM == 1){ // BBKS
-            gamma = OMm * hlittle * pow(E, -OMb - OMb/OMm);
+            gamma = OMm * hlittle * pow(EULER, -OMb - OMb/OMm);
             q = k / (hlittle*gamma);
             T = (log(1.0+2.34*q)/(2.34*q)) *
             pow( 1.0+3.89*q + pow(16.1*q, 2) + pow( 5.46*q, 3) + pow(6.71*q, 4), -0.25);
@@ -554,13 +554,13 @@ namespace fast {
             p = pow(k, POWER_INDEX) / pow( 1+pow( aa*k + pow(bb*k, 1.5) + pow(cc*k,2), 1.13), 2.0/1.13 );
         }
         else if (POWER_SPECTRUM == 3){ // Peebles, pg. 626
-            gamma = OMm * hlittle * pow(E, -OMb - OMb/OMm);
+            gamma = OMm * hlittle * pow(EULER, -OMb - OMb/OMm);
             aa = 8.0 / (hlittle*gamma);
             bb = 4.7 / (hlittle*gamma);
             p = pow(k, POWER_INDEX) / pow(1 + aa*k + bb*k*k, 2);
         }
         else if (POWER_SPECTRUM == 4){ // White, SDM and Frenk, CS, 1991, 379, 52
-            gamma = OMm * hlittle * pow(E, -OMb - OMb/OMm);
+            gamma = OMm * hlittle * pow(EULER, -OMb - OMb/OMm);
             aa = 1.7/(hlittle*gamma);
             bb = 9.0/pow(hlittle*gamma, 1.5);
             cc = 1.0/pow(hlittle*gamma, 2);
@@ -583,12 +583,12 @@ namespace fast {
             else{ dwdr = 9*cos(kR)*k/pow(kR,3) + 3*sin(kR)*(1 - 3/(kR*kR))/(kR*R);}
             //3*k*( 3*cos(kR)/pow(kR,3) + sin(kR)*(-3*pow(kR, -4) + 1/(kR*kR)) );}
             //     dwdr = -1e8 * k / (R*1e3);
-            drdm = 1.0 / (4.0*PI * OMm*RHOcrit * R*R);
+            drdm = 1.0 / (4.0*M_PI* OMm*RHOcrit * R*R);
         }
         else if (FILTER == 1){ // gaussian of width 1/R
-            w = pow(E, -kR*kR/2.0);
+            w = pow(EULER, -kR*kR/2.0);
             dwdr = - k*kR * w;
-            drdm = 1.0 / (pow(2*PI, 1.5) * OMm*RHOcrit * 3*R*R);
+            drdm = 1.0 / (pow(2.*M_PI, 1.5) * OMm*RHOcrit * 3*R*R);
         }
         else {
             fprintf(stderr, "No such filter: %i\nOutput is bogus.\n", FILTER);
@@ -626,7 +626,6 @@ namespace fast {
     }
     
     
-    
     /*
      FUNCTION TFmdm is the power spectrum transfer function from Eisenstein & Hu ApJ, 1999, 511, 5
      */
@@ -636,7 +635,7 @@ namespace fast {
         q = k*pow(theta_cmb,2)/omhh;
         gamma_eff=sqrt(alpha_nu) + (1.0-sqrt(alpha_nu))/(1.0+pow(0.43*k*sound_horizon, 4));
         q_eff = q/gamma_eff;
-        TF_m= log(E+1.84*beta_c*sqrt(alpha_nu)*q_eff);
+        TF_m= log(EULER+1.84*beta_c*sqrt(alpha_nu)*q_eff);
         TF_m /= TF_m + pow(q_eff,2) * (14.4 + 325.0/(1.0+60.5*pow(q_eff,1.11)));
         q_nu = 3.92*q/sqrt(f_nu/N_nu);
         TF_m *= 1.0 + (1.2*pow(f_nu,0.64)*pow(N_nu,0.3+0.6*f_nu)) /
