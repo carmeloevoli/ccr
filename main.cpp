@@ -10,7 +10,28 @@ using namespace std;
 
 double sigma_norm, R, theta_cmb, omhh, z_equality, y_d, sound_horizon, alpha_nu, f_nu, f_baryon, beta_c, d2fact, R_CUTOFF, DEL_CURR, SIG_CURR;
 
+#define v(A) (r*r+1.)
+
 int main() {
+    
+    const double dt = 0.1;
+
+    double r = 0;
+    
+    double t = 0;
+
+    while (r < 10) {
+    
+    double dr = v(r) * dt;
+ 
+        r += dr;
+        
+        t += dt;
+        
+        cout << t << "\t" << r << "\n";
+    }
+    
+    
     
 //    cout << compute_spectrum_normalization(1. * GeV, 0.1 * GeV, 1e4 * GeV, 1e51 * erg, 2.2) << endl;
 
@@ -27,7 +48,7 @@ int main() {
     //print_timescales("output/timescales_at_z20.txt", 20);
     
     fast::init_ps();
-
+    
     //for (double z = 0; z < 30; z += 1) {
     //    double l = UV_mean_free_path(z);
         //cout << z << "\t" << l / Mpc << "\t" << c_light / sqrt(M_PI) / l / fast::hubble(z) / (1+z) << "\t" << 39. * pow((1. + z) / 4., -4.5) << "\n";
@@ -41,7 +62,7 @@ int main() {
     
     //delete S;
     
-    Reionization* R = new Reionization("test_no");
+    Reionization* R = new Reionization("test_no_CR");
     
     R->read_SFR("SFR.txt");
     
@@ -53,7 +74,7 @@ int main() {
     
     R->set_f_esc(2e-4);
         
-    R->evolve();
+    //R->evolve(false);
     
     delete R;
     

@@ -15,7 +15,7 @@ public:
     
     void init_reionization();
     void init_grids();
-    void evolve();
+    void evolve(const bool& doCR);
     void evolve_CR(const double& dt);
     void evolve_IGM(const double& dt);
     void build_losses();

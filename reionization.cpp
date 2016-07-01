@@ -7,6 +7,11 @@ Reionization::Reionization(const string& init_filename_) {
     f_sfr = 4e-2;
     f_esc = 0.1;
     open_output_files();
+    
+    double z = 30;
+    double M = min_star_forming_halo(z);
+    double SFR = f_sfr * Omega_b / (Omega_m - Omega_b) * M / free_fall_timescale(z, M);
+    cout << z << "\t" << M / mass_sun << "\t" << SN_efficiency * SN_kinetic_energy * SN_fraction * SFR / (erg / s) << "\n";
 }
 
 Reionization::~Reionization() {
@@ -96,6 +101,18 @@ double Reionization::hmf_integral_interpolate(const double& x) {
     return y;
 }
 
+
+void Reionization::build_losses() {
+    for (size_t iE = 0; iE < E_size; ++iE) {
+        double E_k_iE = E_k.at(iE);
+        double dEdt = dEdt_adiabatic(z, E_k_iE);
+        dEdt += dEdt_ionization(n_HI, E_k_iE);
+        dEdt += dEdt_coulomb(n_e, E_k_iE);
+        dEdt += dEdt_pp(n_H, E_k_iE);
+        b_losses.at(iE) = -dEdt;
+    }
+}
+
 void Reionization::evolve_IGM(const double& dt) {
     double A = (PopII_spectrum_slope - 1.) / (PopII_spectrum_slope + 0.5);
     double B = (PopII_spectrum_slope - 1.) / (pow2(PopII_spectrum_slope) - .25);
@@ -119,17 +136,6 @@ void Reionization::evolve_IGM(const double& dt) {
     optical_depth += SIGMAT * n_e * c_light * -dt;
     
     return;
-}
-
-void Reionization::build_losses() {
-    for (size_t iE = 0; iE < E_size; ++iE) {
-        double E_k_iE = E_k.at(iE);
-        double dEdt = dEdt_adiabatic(z, E_k_iE);
-        dEdt += dEdt_ionization(n_HI, E_k_iE);
-        dEdt += dEdt_coulomb(n_e, E_k_iE);
-        dEdt += dEdt_pp(n_H, E_k_iE);
-        b_losses.at(iE) = 0.0;//-dEdt;
-    }
 }
 
 void Reionization::evolve_CR(const double& dt) {
@@ -162,7 +168,7 @@ void Reionization::evolve_CR(const double& dt) {
     return; //max_difference;
 }
 
-void Reionization::evolve() {
+void Reionization::evolve(const bool& doCR) {
     
     cout << "Begin solver ...\n";
     
@@ -178,11 +184,12 @@ void Reionization::evolve() {
         
         evolve_IGM(dt);
         
-        evolve_CR(dt);
+        if (doCR)
+            evolve_CR(dt);
         
         z -= dz;
         
-        if (counter % (int)(1./dz) == 0) {
+        if (counter % (int)(0.1/dz) == 0) {
             print_status(false);
             dump_N(z);
         }
