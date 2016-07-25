@@ -28,7 +28,7 @@ void Reionization::dump_N(const double& z) {
     outfile << "#E - N " << endl;
     outfile << scientific << setprecision(2);
     for (size_t i = 0; i < E_k.size(); ++i) {
-        outfile << E_k.at(i) / GeV << "\t" << N_cr.at(i) << "\n";
+        outfile << E_k.at(i) << "\t" << N_cr.at(i) << "\t" << cz * Q_sn.at(i) << "\t" << n_H << "\n";
     }
     outfile.close();
 }
@@ -46,7 +46,6 @@ void Reionization::print_status(bool doTitle) {
         fout_losses << (E_k / dEdt_ionization(n_HI, E_k)) / Gyr << "\t";
         fout_losses << (E_k / dEdt_coulomb(n_e, E_k)) / Gyr << "\t";
         fout_losses << (E_k / dEdt_pp(n_H, E_k)) / Gyr << "\t";
-//        cout << E_k / GeV << "\t" << n_H << "\t" << dEdt_pp(n_H, E_k) << "\t" << (E_k / dEdt_pp(n_H, E_k)) / Gyr << "\n";
         fout_losses << (E_k / dEdt_adiabatic(z, E_k)) / Gyr << "\t";
         E_k = 10. * MeV;
         fout_losses << (E_k / dEdt_ionization(n_HI, E_k)) / Gyr << "\t";
@@ -69,7 +68,10 @@ void Reionization::print_status(bool doTitle) {
         fout_igm << sn_energy_rate / (erg / pow3(cm) / s) << "\t";
         //cout << cz / (1. / erg / pow3(cm) / s) << "\t";
         fout_igm << ionization_rate / (1. / Myr) << "\t";
+        fout_igm << ionization_rate_CR / (1. / Myr) << "\t";
         fout_igm << recombination_rate / (1. / Myr) << "\t";
+        fout_igm << heating_rate / (1. / Myr) << "\t";
+        fout_igm << heating_rate_CR / (1. / Myr) << "\t";
         fout_igm << "\n";
     }
 }

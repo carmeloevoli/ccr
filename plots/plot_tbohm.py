@@ -11,6 +11,7 @@ rc('xtick', labelsize=18)
 rc('ytick', labelsize=18)
 rcParams['legend.numpoints'] = 1
 rcParams['lines.linewidth'] = 3
+rcParams['figure.autolayout'] = True
 
 fig = plt.figure(figsize=(8.1, 7.8))
 ax = fig.add_subplot(1, 1, 1)
@@ -42,33 +43,45 @@ def read_file(datafile,xcol,ycol):
     data.append(np.array(y))
     return data
 
+def plot_minmass(z,color):
+    m = 1e8 * (10. / (1. + z))**(1.5)
+    plt.plot([m,m],[1e-10,1e10],linestyle=':',color=color)
+
+def plot_timescale(E_k,z,d,color):
+    m_p = 0.984
+    E_t = E_k + m_p
+    p = np.sqrt(E_t**2. - m_p**2.)
+    
+    DB = 1.1 * p * (1. + z)**(-2.)
+    t = d * d / DB
+    plt.plot(E_k,t,color=color)
+
+def plot_thubble(z,color):
+    t = 19. * (1. + z)**(-3./2.)
+    plt.plot([1e-5,1e5],[t,t],linestyle=':',color=color)
+
 plt.yscale('log')
-#plt.xscale('log')
+plt.xscale('log')
 
-plt.xlabel(r'$z$', size=28)
-plt.ylabel(r'$\Lambda_{\rm ion}$ [Myr$^{-1}$]', size=28)
+plt.xlabel(r'$E$ [GeV]', size=28)
+plt.ylabel(r'$t$ [Gyr]', size=28)
 
-plt.axis()#[1e-3,10,1e-2,1e5],interpolation='none')
+plt.axis()#[1e7,1e10,1e-3,1e2])#[1e-3,10,1e-2,1e5],interpolation='none')
 
-data = read_file('output/test_with_CR_100_keV_igm.txt',0,6)
-plt.plot(data[0],data[1],'b',label='Ph-Ion')
+E_k = np.logspace(-3,3,100)
 
-data = read_file('output/test_with_CR_100_keV_igm.txt',0,7)
-plt.plot(data[0],data[1],'b--',label='CR-Ion')
+plot_timescale(E_k,30.,0.5,'b')
 
-data = read_file('output/test_with_CR_100_keV_igm.txt',0,9)
-plt.plot(data[0],data[1],'r',label='Ph-Heating')
+plot_thubble(30,'b')
 
-data = read_file('output/test_with_CR_100_keV_igm.txt',0,10)
-plt.plot(data[0],data[1],'r--',label='CR-Heating')
+plot_timescale(E_k,20.,0.05,'r')
+
+plot_thubble(20,'r')
 
 
-#plt.text(16.5,10,'Coulomb',size=20,rotation=65)
-
-#plt.ylim()[1e-7,1e-2])
 
 #plt.legend(loc='upper right')
 
-#plt.show()
+plt.show()
 
-plt.savefig('photo_ionization_rate.pdf', format='pdf', bbox_inches='tight', dpi=300)
+#plt.savefig('timescales.pdf', format='pdf', bbox_inches='tight', dpi=300)

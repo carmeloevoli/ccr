@@ -11,6 +11,7 @@ rc('xtick', labelsize=18)
 rc('ytick', labelsize=18)
 rcParams['legend.numpoints'] = 1
 rcParams['lines.linewidth'] = 3
+rcParams['figure.autolayout'] = True
 
 fig = plt.figure(figsize=(8.1, 7.8))
 ax = fig.add_subplot(1, 1, 1)
@@ -42,33 +43,33 @@ def read_file(datafile,xcol,ycol):
     data.append(np.array(y))
     return data
 
+def plot_minmass(z,color):
+    m = 1e8 * (10. / (1. + z))**(1.5)
+    plt.plot([m,m],[1e-10,1e10],linestyle=':',color=color)
+
+
 plt.yscale('log')
-#plt.xscale('log')
+plt.xscale('log')
 
-plt.xlabel(r'$z$', size=28)
-plt.ylabel(r'$\Lambda_{\rm ion}$ [Myr$^{-1}$]', size=28)
+plt.xlabel(r'$M$ [M$_\odot$]', size=28)
+plt.ylabel(r'$d$ [Mpc]', size=28)
 
-plt.axis()#[1e-3,10,1e-2,1e5],interpolation='none')
+plt.axis([1e7,1e10,1e-3,1e2])#[1e-3,10,1e-2,1e5],interpolation='none')
 
-data = read_file('output/test_with_CR_100_keV_igm.txt',0,6)
-plt.plot(data[0],data[1],'b',label='Ph-Ion')
+data = read_file('hmf_20.txt',1,2)
 
-data = read_file('output/test_with_CR_100_keV_igm.txt',0,7)
-plt.plot(data[0],data[1],'b--',label='CR-Ion')
+plt.plot(data[0],3e-2*(data[0]*data[1])**(-1./3.)*(1.+20)/21.,'r',label='z=20')
 
-data = read_file('output/test_with_CR_100_keV_igm.txt',0,9)
-plt.plot(data[0],data[1],'r',label='Ph-Heating')
+plot_minmass(20.,'r')
 
-data = read_file('output/test_with_CR_100_keV_igm.txt',0,10)
-plt.plot(data[0],data[1],'r--',label='CR-Heating')
+data = read_file('hmf_30.txt',1,2)
 
+plt.plot(data[0],3e-2*(data[0]*data[1])**(-1./3.)*(1.+30)/21.,'b',label='z=30')
 
-#plt.text(16.5,10,'Coulomb',size=20,rotation=65)
+plot_minmass(30.,'b')
 
-#plt.ylim()[1e-7,1e-2])
-
-#plt.legend(loc='upper right')
+plt.legend(loc='upper right')
 
 #plt.show()
 
-plt.savefig('photo_ionization_rate.pdf', format='pdf', bbox_inches='tight', dpi=300)
+plt.savefig('distance.pdf', format='pdf', bbox_inches='tight', dpi=300)

@@ -78,7 +78,7 @@ double free_fall_timescale(const double& z, const double& halo_mass) {
     double virial_volume_phyisical = 4./3. * M_PI * pow3(virial_radius_physical);
     
     double halo_dark_density = halo_mass / virial_volume_phyisical;
-    
+        
     return sqrt(3. * M_PI / 32. / G / halo_dark_density);
 }
 

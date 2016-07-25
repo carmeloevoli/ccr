@@ -20,6 +20,9 @@ public:
     void evolve_IGM(const double& dt);
     void build_losses();
 
+    double compute_ionization_rate_CR();
+    double compute_heating_rate_CR();
+    
     void print_status(bool doTitle);
     void dump_N(const double& z);
     void open_output_files();
@@ -59,8 +62,10 @@ private:
     double f_sfr;
     double f_esc;
     double ionization_rate;
+    double ionization_rate_CR;
     double recombination_rate;
     double heating_rate;
+    double heating_rate_CR;
     double star_formation_rate_comoving;
     double star_formation_rate_physical;
     double optical_depth;

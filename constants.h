@@ -98,6 +98,7 @@ static const double ionization_potential_H = 13.6 * eV;
 static const double A_He = 4;
 static const double Z_He = 2;
 static const double ionization_potential_He = 24.6 * eV;
+static const double W_H = 36.3 * eV;
 
 // PLANCK Cosmological constants
 static const double hlittle = 0.6711;
@@ -125,14 +126,14 @@ static const double SN_slope = 2.2;
 static const double SN_efficiency = 0.1;
 static const double SN_kinetic_energy = 1e51 * erg;
 static const double SN_fraction = 0.01 / mass_sun;
-static const double SN_E_min = 1. * MeV;
+static const double SN_E_min = 100. * keV;
 static const double SN_E_max = 1. * TeV;
 static const double initial_redshift = 30.;
 static const double UV_photoionization_cs = 6.3e-18 * pow2(cm);
 static const double PopII_spectrum_slope = 5.;
 static const double PopII_dNdM = 8e60 / mass_sun;
 static const double clumping_factor = 2.;
-static const size_t E_size = 6 * 32;
+static const size_t E_size = 7 * 32;
 
 #include "cosmology_params.h"
 #include "anal_params.h"

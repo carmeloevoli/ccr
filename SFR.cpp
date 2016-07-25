@@ -63,11 +63,13 @@ void SFR::print_hmf(const double& z, const double& M_min, const double& M_max) {
      */
     
     double dNdM = -1;
+    double ff = -1;
     
-    printf ("#Redshift - Mass [Msun] - dNdM [Mpc^-3 Msun^-1]\n");
+    printf ("#Redshift - Mass [Msun] - dNdM [Mpc^-3 Msun^-1] - t_ff [s] \n");
     
     for (double M = M_min; M <= M_max; M *= 1.1){
-        dNdM = fast::dNdM_st(z,M);
-        printf ("%5.2e %5.2e %5.2e\n", z, M, dNdM);
+        dNdM = fast::dNdM_st(z, M);
+        ff = free_fall_timescale(z, M);
+        printf ("%5.2e %5.2e %5.2e %5.2e\n", z, M, dNdM, ff);
     }
 }

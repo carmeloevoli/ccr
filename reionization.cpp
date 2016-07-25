@@ -42,7 +42,9 @@ void Reionization::init_reionization() {
     z = initial_redshift;
     optical_depth = 0;
     heating_rate = 0;
+    heating_rate_CR = 0;
     ionization_rate = 0;
+    ionization_rate_CR = 0;
     recombination_rate = 0;
     normalization_integral = compute_spectrum_normalization(reference_energy, SN_E_min, SN_E_max, SN_slope);
     optical_depth_PLANCK = 0.055 + 3. * 0.009;
@@ -138,9 +140,34 @@ void Reionization::evolve_IGM(const double& dt) {
     return;
 }
 
+double Reionization::compute_ionization_rate_CR() {
+    double sum = 0;
+    double delta_lnE = log(E_k.at(1) / E_k.at(0));
+    for (size_t iE = 0; iE < E_k.size(); iE++) {
+        double E_k_iE = E_k.at(iE);
+        sum += dEdt_ionization(n_HI, E_k_iE) * N_cr.at(iE) * E_k_iE;
+    }
+    
+    return delta_lnE * sum / W_H;
+}
+
+double Reionization::compute_heating_rate_CR() {
+    double sum_C = 0;
+    double sum_I = 0;
+    double delta_lnE = log(E_k.at(1) / E_k.at(0));
+    for (size_t iE = 0; iE < E_k.size(); iE++) {
+        double E_k_iE = E_k.at(iE);
+        sum_C += dEdt_coulomb(n_e, E_k_iE) * N_cr.at(iE) * E_k_iE;
+        sum_I += dEdt_ionization(n_HI, E_k_iE) * N_cr.at(iE) * E_k_iE;
+    }
+    
+    return delta_lnE * (sum_C +  sum_I);
+}
+
 void Reionization::evolve_CR(const double& dt) {
     sn_energy_rate = SN_efficiency * SN_kinetic_energy * SN_fraction * star_formation_rate_physical; // E V^-1 T^-1
     cz = sn_energy_rate / pow2(reference_energy) / normalization_integral;
+    n_H = n_H_physical(z);
     
     build_losses();
     
@@ -154,7 +181,7 @@ void Reionization::evolve_CR(const double& dt) {
             lowerDiagonal.at(iE - 1) = 0;
         knownTerm.at(iE) = .5 * (1. - alpha2) * N_cr.at(iE);
         knownTerm.at(iE) += .5 * (1. + alpha3) * N_cr.at(iE + 1);
-        knownTerm.at(iE) += .5 * fabs(dt) * cz * (Q_sn.at(iE + 1) + Q_sn.at(iE));
+        knownTerm.at(iE) += .5 * fabs(dt) * cz * (Q_sn.at(iE + 1) + Q_sn.at(iE)) / n_H;
     }
     
     gsl_linalg_solve_tridiag(diagonal, upperDiagonal, lowerDiagonal, knownTerm, N_next);
@@ -162,6 +189,9 @@ void Reionization::evolve_CR(const double& dt) {
     for (size_t iE = 0; iE < E_size - 1; ++iE) {
         N_cr.at(iE) = max(N_next.at(iE), 0.);
     }
+    
+    ionization_rate_CR = compute_ionization_rate_CR();
+    heating_rate_CR = compute_heating_rate_CR();
     
     //cout << dt << "\t" << *min_element(N_cr.begin(),N_cr.end()) << "\t" << *max_element(N_cr.begin(),N_cr.end()) << "\n";
     

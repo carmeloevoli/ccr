@@ -14,32 +14,13 @@ double sigma_norm, R, theta_cmb, omhh, z_equality, y_d, sound_horizon, alpha_nu,
 
 int main() {
     
-    const double dt = 0.1;
+    //cout << compute_spectrum_normalization(1. * GeV, 0.1 * GeV, 1e4 * GeV, 1e51 * erg, 2.2) << endl;
 
-    double r = 0;
-    
-    double t = 0;
+    //cout << compute_spectrum_normalization(1. * GeV, 0.1 * GeV, 1e5 * GeV, 1e51 * erg, 2.2) << endl;
 
-    while (r < 10) {
-    
-    double dr = v(r) * dt;
- 
-        r += dr;
-        
-        t += dt;
-        
-        cout << t << "\t" << r << "\n";
-    }
-    
-    
-    
-//    cout << compute_spectrum_normalization(1. * GeV, 0.1 * GeV, 1e4 * GeV, 1e51 * erg, 2.2) << endl;
+    //cout << compute_spectrum_normalization(1. * GeV, 0.1 * GeV, 1e6 * GeV, 1e51 * erg, 2.2) << endl;
 
-//    cout << compute_spectrum_normalization(1. * GeV, 0.1 * GeV, 1e5 * GeV, 1e51 * erg, 2.2) << endl;
-
-//    cout << compute_spectrum_normalization(1. * GeV, 0.1 * GeV, 1e6 * GeV, 1e51 * erg, 2.2) << endl;
-
-  //  cout << compute_spectrum_normalization(1. * GeV, 0.01 * GeV, 1e6 * GeV, 1e51 * erg, 2.2) << endl;
+    //cout << compute_spectrum_normalization(1. * GeV, 0.01 * GeV, 1e6 * GeV, 1e51 * erg, 2.2) << endl;
 
     //cout << compute_spectrum_normalization(1. * GeV, 0.001 * GeV, 1e6 * GeV, 1e51 * erg, 2.2) << endl;
 
@@ -50,19 +31,27 @@ int main() {
     fast::init_ps();
     
     //for (double z = 0; z < 30; z += 1) {
-    //    double l = UV_mean_free_path(z);
-        //cout << z << "\t" << l / Mpc << "\t" << c_light / sqrt(M_PI) / l / fast::hubble(z) / (1+z) << "\t" << 39. * pow((1. + z) / 4., -4.5) << "\n";
+    //double l = UV_mean_free_path(z);
+    //cout << z << "\t" << l / Mpc << "\t" << c_light / sqrt(M_PI) / l / fast::hubble(z) / (1+z) << "\t" << 39. * pow((1. + z) / 4., -4.5) << "\n";
     //}
 
-    //SFR* S = new SFR("SFR.txt");
+    cout << 1. / H_0 / sqrt(Omega_m) / n_H_0 << "\n";
     
-    //S->print_hmf(30, 1e6, 1e12);
+    bool doSFR = false;
+    bool doReionization = false;
+    
+    if (doSFR) {
+    SFR* S = new SFR("SFR.txt");
+    
+    S->print_hmf(10, 1e6, 1e15);
     
     //S->evolve();
     
-    //delete S;
+    delete S;
+    }
     
-    Reionization* R = new Reionization("test_no_CR");
+    if (doReionization) {
+    Reionization* R = new Reionization("test_with_CR_100_keV");
     
     R->read_SFR("SFR.txt");
     
@@ -74,9 +63,10 @@ int main() {
     
     R->set_f_esc(2e-4);
         
-    //R->evolve(false);
+    //R->evolve(true);
     
     delete R;
+    }
     
     /*	TEvolve* E = new TEvolve(400,"var");
      

@@ -17,10 +17,10 @@ public:
     ~SFR();
     
     void evolve();
+    void print_hmf(const double& z, const double& M_min, const double& M_max);
     
 private:
     double integrate_hmf(double z, const double& M_min, const double& M_max);
-    void print_hmf(const double& z, const double& M_min, const double& M_max);
 
     string filename;
     ofstream outfile;
