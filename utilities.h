@@ -33,7 +33,7 @@ double min_star_forming_halo(const double& z);
 
 double free_fall_timescale(const double& z, const double& M);
 
-double spectrum(const double& E_k);
+double spectrum(const double& E_k, const double& SN_slope);
 
 double compute_spectrum_normalization(double E_0, double E_min, double E_max, double alpha);
 
@@ -44,5 +44,7 @@ double UV_mean_free_path(const double& z);
 double baryon_number(const double& z);
 
 double hubble_time(const double& z);
+
+double Bohm_diffusion(const double& z, const double& E_k);
 
 #endif /* UTILITIES_H_ */

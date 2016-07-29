@@ -50,6 +50,22 @@ public:
         this->f_esc = f_esc;
     }
     
+    inline void set_E_min(const double& E_min) {
+        this->SN_E_min = E_min;
+    }
+    
+    inline void set_E_max(const double& E_max) {
+        this->SN_E_max = E_max;
+    }
+    
+    inline void set_SN_slope(const double& slope) {
+        this->SN_slope = slope;
+    }
+    
+    inline void set_E_size(const int& E_size) {
+        this->SN_E_size = E_size;
+    }
+    
 private:
     double optical_depth_PLANCK;
     double z;
@@ -72,6 +88,11 @@ private:
     double sn_energy_rate;
     double cz;
     double normalization_integral;
+    double SN_E_min;
+    double SN_E_max;
+    double SN_slope;
+    
+    size_t SN_E_size;
     
     vector<double> hmf_z;
     vector<double> hmf_integral;

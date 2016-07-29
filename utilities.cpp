@@ -3,6 +3,16 @@
 #define gamma(E) (1.0 + E / mass_proton_c2)
 #define beta(E) (sqrt(1.0 - 1.0 / pow2(1.0 + E / mass_proton_c2)))
 
+double Bohm_diffusion(const double& z, const double& E_k) {
+    
+    double p = E_k * sqrt(1. + 2. * mass_proton_c2 / E_k);
+    double B16 = B_IGM / (1e-16 * G);
+    double z2 = pow2((1. + z) / 21.);
+        
+    return 1.1 * pow2(Mpc) / Gyr * (p / GeV) / B16 / z2;
+}
+
+
 double dEdt_ionization(const double& n_HI, const double& E_k) {
     
     double p_squared = pow2(gamma(E_k)) - 1.;
@@ -98,7 +108,7 @@ double baryon_number(const double& z) {
     return 0;
 }
 
-double spectrum(const double& E_k) {
+double spectrum(const double& E_k, const double& SN_slope) {
     
     double normalization = 1;
     
@@ -109,10 +119,6 @@ double spectrum(const double& E_k) {
     double p_0 = sqrt(E_k_0 * E_k_0 + 2. * mass_proton_c2 * E_k_0);
     
     return normalization * pow(p / p_0, -SN_slope);
-}
-
-double compute_source_normalization() {
-    return 0;
 }
 
 double min_star_forming_halo(const double& z) {
@@ -136,7 +142,7 @@ void print_timescales(string filename, const double& z) {
     outfile << scientific << setprecision(3);
     for (double E_k = MeV; E_k < 200. * GeV; E_k *= 1.2) {
         outfile << E_k / GeV << "\t" << fast::t_hubble(z) << "\t";
-        outfile << spectrum(E_k) << "\t";
+        outfile << spectrum(E_k, 2.2) << "\t";
         outfile << E_k / dEdt_ionization(n_HI, E_k) << "\t";
         outfile << E_k / dEdt_coulomb_Galprop(n_e, E_k) << "\t" << E_k / dEdt_coulomb(n_e, E_k) << "\t";
         outfile << E_k / dEdt_adiabatic(z, E_k) << "\t" ;
@@ -162,7 +168,7 @@ double compute_spectrum_normalization(double E_0, double E_min, double E_max, do
     gsl_function F;
     F.function = &I_spectrum;
     F.params = params;
-    
+        
     gsl_integration_qag (&F, E_min / E_0, E_max / E_0, 0, 1e-5, 10000, 3, w, &result, &error);
     
     gsl_integration_workspace_free (w);

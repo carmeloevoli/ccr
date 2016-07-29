@@ -18,7 +18,8 @@ public:
     
     void evolve();
     void print_hmf(const double& z, const double& M_min, const double& M_max);
-    
+    void print_mean_halo_distance();
+
 private:
     double integrate_hmf(double z, const double& M_min, const double& M_max);
 
