@@ -33,6 +33,8 @@ double min_star_forming_halo(const double& z);
 
 double free_fall_timescale(const double& z, const double& M);
 
+double circular_velocity_at_rvir(const double& M);
+
 double spectrum(const double& E_k);
 
 double compute_spectrum_normalization(double E_0, double E_min, double E_max, double alpha);

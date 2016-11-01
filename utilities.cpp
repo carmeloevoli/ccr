@@ -119,6 +119,10 @@ double min_star_forming_halo(const double& z) {
     return 1e8 * mass_sun * pow(10. / (1.+z), 1.5);
 }
 
+double circular_velocity_at_rvir(const double& M) {
+    return 24.0 * km / s * pow(M / (1e8 * mass_sun), 1./3.) * pow((1. + z) / 10., 0.5);
+}
+
 void print_timescales(string filename, const double& z) {
     cout << "Print timescales in " << filename << "\n";
     
