@@ -69,6 +69,10 @@ def oplot_d_halo():
 
     plt.text(4,0.008,'M$_{min}$',fontsize=25,color='b')
 
+def oplot_CR():
+    z = np.linspace(0,30,100)
+
+
 def oplot_X_ray():
     z = np.linspace(0,30,100)
     
@@ -91,21 +95,21 @@ plt.ylabel(r'$\lambda$ [Mpc]', size=28)
 
 plt.axis()#[1e7,1e10,1e-3,1e2])#[1e-3,10,1e-2,1e5],interpolation='none')
 
-data = read_file("output/test_with_CR_1_MeV_losses.txt",0,6,7)
+#data = read_file("output/test_with_CR_1_MeV_losses.txt",0,6,7)
 
-z = data[0]
-d = np.sqrt(data[2]*data[1]) / 1e3 # Mpc
+#z = data[0]
+#d = np.sqrt(data[2]*data[1]) / 1e3 # Mpc
 
-plt.plot(z,d,color='r',label='E = 1 MeV')
+#plt.plot(z,d,color='r',label='E = 1 MeV')
 
-data = read_file("output/test_with_CR_1_MeV_losses.txt",0,12,13)
+#data = read_file("output/test_with_CR_1_MeV_losses.txt",0,12,13)
 
-z = data[0]
-d = np.sqrt(data[2]*data[1]) / 1e3 # Mpc
+#z = data[0]
+#d = np.sqrt(data[2]*data[1]) / 1e3 # Mpc
 
-plt.plot(z,d,color='g',label='E = 10 MeV')
+#plt.plot(z,d,color='g',label='E = 10 MeV')
 
-oplot_d_halo()
+#oplot_d_halo()
 
 oplot_X_ray()
 
@@ -113,6 +117,6 @@ plt.ylim([1e-3,1e2])
 
 plt.legend(loc='upper right',fontsize=24)
 
-#plt.show()
+plt.show()
 
-plt.savefig('distance_bohm.pdf', format='pdf', dpi=300)
+#plt.savefig('distance_bohm.pdf', format='pdf', dpi=300)

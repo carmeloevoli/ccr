@@ -23,8 +23,8 @@ ax.minorticks_on()
 ax.tick_params('both', length=15, width=1.5, which='major', pad=6)
 ax.tick_params('both', length=10, width=1.3, which='minor', pad=6)
 
-plt.xticks(size=28)
-plt.yticks(size=28)
+plt.xticks(size=35)
+plt.yticks(size=35)
 # end plot style options
 
 def read_file(datafile,xcol,ycol):
@@ -44,7 +44,7 @@ def read_file(datafile,xcol,ycol):
     return data
 
 def plot_ionization():
-    plt.ylabel(r'Ionization Rate [Myr$^{-1}$]', size=28)
+    plt.ylabel(r'Ionization Rate [Myr$^{-1}$]', size=35)
     plt.ylim([1e-9,1e-3])
 
     data = read_file('output/test_with_CR_2.0_igm.txt',0,6)
@@ -59,10 +59,10 @@ def plot_ionization():
     data = read_file('output/test_with_CR_2.5_igm.txt',0,7)
     plt.plot(data[0],1.4*data[1],'g',label=r'$\alpha = 2.5$')
 
-    plt.legend(loc='upper right',fontsize=16)
+    plt.legend(loc='upper right',fontsize=20)
 
 def plot_heating():
-    plt.ylabel(r'$\Delta T_{\rm IGM}$ [K]', size=28)
+    plt.ylabel(r'$\Delta T_{\rm IGM}$ [K]', size=35)
     plt.ylim([1e0,1e4])
 
     kB = 1.3806488e-16 # kelvin / erg
@@ -85,10 +85,13 @@ def plot_heating():
     dT = 2. / 3. / kB / Hz * np.array(data[1]) / 3.14e13 # kelvin / erg * s * erg / Myr
     plt.plot(data[0],1.4*dT,'g',label=r'$\alpha = 2.5$')
 
-    plt.legend(loc='upper right',fontsize=20)
+    plt.plot(data[0],(1.+data[0])*2.725,'k--')
+    plt.text(16,70,r'$T_{\rm CMB}$',fontsize=35)
+
+    plt.legend(loc='upper right',fontsize=30)
 
 plt.yscale('log')
-plt.xlabel(r'$z$', size=28)
+plt.xlabel(r'$z$', size=35)
 plt.axis()#[1e-3,10,1e-2,1e5],interpolation='none')
 plt.xlim([6,20])
 
@@ -100,10 +103,12 @@ plt.xlim([6,20])
 
 #plt.text(16.5,10,'Coulomb',size=20,rotation=65)
 
-plot_heating()
+#plot_heating()
 
-#plot_ionization()
+plot_ionization()
 
 #plt.show()
 
-plt.savefig('heating_rate.pdf', format='pdf', dpi=300)
+#plt.savefig('heating_rate.pdf', format='pdf', dpi=300)
+
+plt.savefig('ion_rate.pdf', format='pdf', dpi=300)
