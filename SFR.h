@@ -18,10 +18,23 @@ public:
     
     void evolve();
     void print_hmf(const double& z, const double& M_min, const double& M_max);
-    
+
+	void set_efficiency(double efficiency) {
+		this->efficiency = efficiency;
+	}
+
+	void set_filename(const string& filename) {
+		this->filename = filename;
+	}
+
+	void set_vvir_cut(double vvir_cut) {
+		this->vvir_cut = vvir_cut;
+	}
+
 private:
     double integrate_hmf(double z, const double& M_min, const double& M_max);
-
+    double efficiency;
+    double vvir_cut;
     string filename;
     ofstream outfile;
 };

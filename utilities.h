@@ -33,7 +33,9 @@ double min_star_forming_halo(const double& z);
 
 double free_fall_timescale(const double& z, const double& M);
 
-double circular_velocity_at_rvir(const double& M);
+double circular_velocity_at_rvir(const double& M, const double& z);
+
+double halo_mass_given_vvir(const double& v, const double& z);
 
 double spectrum(const double& E_k);
 
@@ -42,8 +44,6 @@ double compute_spectrum_normalization(double E_0, double E_min, double E_max, do
 double compute_initial_tau(const double& init_redshift);
 
 double UV_mean_free_path(const double& z);
-
-double baryon_number(const double& z);
 
 double hubble_time(const double& z);
 

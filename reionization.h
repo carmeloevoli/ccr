@@ -26,10 +26,13 @@ public:
     void print_status(bool doTitle);
     void dump_N(const double& z);
     void open_output_files();
+    void open_spectrum_file(const double& z);
     void close_output_files();
+    void close_spectrum_file();
     void read_SFR(const string& filename);
     double hmf_integral_interpolate(const double& z);
-    
+    void plot_source_function(const double& z);
+
     inline void set_dz(const double& dz) {
         this->dz = dz;
     }
@@ -91,6 +94,7 @@ private:
     
     ofstream fout_losses;
     ofstream fout_igm;
+    ofstream fout_spectrum;
 };
 
 #endif
