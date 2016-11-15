@@ -12,9 +12,20 @@ void Reionization::open_output_files() {
     fout_igm.open(igm_filename.c_str());
 }
 
+void Reionization::open_spectrum_file(const double& z) {
+    string filename = "output/";
+    filename += init_filename;
+    filename += "_spectrum.txt";
+    fout_spectrum.open(filename.c_str());
+}
+
 void Reionization::close_output_files() {
     fout_losses.close();
     fout_igm.close();
+}
+
+void Reionization::close_spectrum_file() {
+    fout_spectrum.close();
 }
 
 void Reionization::dump_N(const double& z) {

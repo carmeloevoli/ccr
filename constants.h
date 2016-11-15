@@ -122,10 +122,11 @@ static const double f_He = n_He_0 / (n_H_0 + n_He_0); /* helium number fraction 
 
 // source constants
 static const double reference_energy = 1. * GeV;
+//static const double SN_slope = 2.0;
 static const double SN_efficiency = 0.1;
 static const double SN_kinetic_energy = 1e51 * erg;
 static const double SN_fraction = 0.01 / mass_sun;
-static const double initial_redshift = 30.;
+static const double initial_redshift = 20.;
 static const double UV_photoionization_cs = 6.3e-18 * pow2(cm);
 static const double PopII_spectrum_slope = 5.;
 static const double PopII_dNdM = 8e60 / mass_sun;
