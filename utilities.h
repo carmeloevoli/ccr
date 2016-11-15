@@ -37,7 +37,7 @@ double circular_velocity_at_rvir(const double& M, const double& z);
 
 double halo_mass_given_vvir(const double& v, const double& z);
 
-double spectrum(const double& E_k);
+double spectrum(const double& E_k, const double& SN_slope);
 
 double compute_spectrum_normalization(double E_0, double E_min, double E_max, double alpha);
 
@@ -46,5 +46,7 @@ double compute_initial_tau(const double& init_redshift);
 double UV_mean_free_path(const double& z);
 
 double hubble_time(const double& z);
+
+double Bohm_diffusion(const double& z, const double& E_k);
 
 #endif /* UTILITIES_H_ */

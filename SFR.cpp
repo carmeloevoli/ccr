@@ -76,3 +76,14 @@ void SFR::print_hmf(const double& z, const double& M_min, const double& M_max) {
 		printf ("%5.2e %5.2e %5.2e %5.2e\n", z, M, dNdM, ff);
 	}
 }
+
+void SFR::print_mean_halo_distance() {
+    
+    cout << "#Redshift - Mass [Msun] - dNdM [Mpc^-3 Msun^-1] - t_ff [s] \n";
+
+    for (double z = 30; z > 0; z -= 0.05) {
+        double min_sfr_halo = min_star_forming_halo(z) / mass_sun; // M
+        double dNdM = fast::dNdM_st(z, min_sfr_halo);
+        cout << z << "\t" << min_sfr_halo << "\t" << dNdM << "\t" << 0 << "\n";
+    }
+}

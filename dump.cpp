@@ -32,7 +32,7 @@ void Reionization::dump_N(const double& z) {
     cout << "Dump spectrum at z = " << z << "\n";
     stringstream sstream;
     string filename;
-    sstream << "output/" << init_filename << "_spectra_" << E_size << "_at_" << z << "_fesc_" << f_esc << "_fsfr_" << f_sfr << ".txt";
+    sstream << "output/" << init_filename << "_spectra_" << SN_E_size << "_at_" << z << "_fesc_" << f_esc << "_fsfr_" << f_sfr << ".txt";
     filename = sstream.str();
     ofstream outfile;
     outfile.open(filename.c_str());
@@ -50,19 +50,26 @@ void Reionization::print_status(bool doTitle) {
         fout_igm << "#z - x_II - T_k[K] - optical_depth - SFR [M_sun Mpc^-3 yr^-1] - Ion Rate [Myr^-1] - Rec Rate [Myr^-1]" << "\n";
     }
     else if (z > 0) {
+        double E_k, dEdt_tot;
         fout_losses << scientific << setprecision(3);
         fout_losses << z << "\t";
         fout_losses << x_II << "\t";
-        double E_k = 1. * MeV;
+        E_k = 1. * MeV;
         fout_losses << (E_k / dEdt_ionization(n_HI, E_k)) / Gyr << "\t";
         fout_losses << (E_k / dEdt_coulomb(n_e, E_k)) / Gyr << "\t";
         fout_losses << (E_k / dEdt_pp(n_H, E_k)) / Gyr << "\t";
         fout_losses << (E_k / dEdt_adiabatic(z, E_k)) / Gyr << "\t";
+        dEdt_tot = dEdt_ionization(n_HI, E_k) + dEdt_coulomb(n_e, E_k) + dEdt_pp(n_H, E_k) + dEdt_adiabatic(z, E_k);
+        fout_losses << (E_k / dEdt_tot) / Gyr << "\t";
+        fout_losses << Bohm_diffusion(z, E_k) / (kpc * kpc / Gyr) << "\t";
         E_k = 10. * MeV;
         fout_losses << (E_k / dEdt_ionization(n_HI, E_k)) / Gyr << "\t";
         fout_losses << (E_k / dEdt_coulomb(n_e, E_k)) / Gyr << "\t";
         fout_losses << (E_k / dEdt_pp(n_H, E_k)) / Gyr << "\t";
         fout_losses << (E_k / dEdt_adiabatic(z, E_k)) / Gyr << "\t";
+        dEdt_tot = dEdt_ionization(n_HI, E_k) + dEdt_coulomb(n_e, E_k) + dEdt_pp(n_H, E_k) + dEdt_adiabatic(z, E_k);
+        fout_losses << (E_k / dEdt_tot) / Gyr << "\t";
+        fout_losses << Bohm_diffusion(z, E_k) / (kpc * kpc / Gyr) << "\t";
         fout_losses << hubble_time(z) / Gyr << "\t";
         //cout << fast::t_hubble(z) / Gyr << "\t";
         fout_losses << "\n";

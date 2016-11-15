@@ -3,6 +3,16 @@
 #define gamma(E) (1.0 + E / mass_proton_c2)
 #define beta(E) (sqrt(1.0 - 1.0 / pow2(1.0 + E / mass_proton_c2)))
 
+double Bohm_diffusion(const double& z, const double& E_k) {
+    
+    double p = E_k * sqrt(1. + 2. * mass_proton_c2 / E_k);
+    double B16 = B_IGM / (1e-16 * G);
+    double z2 = pow2((1. + z) / 21.);
+        
+    return 1.1 * pow2(Mpc) / Gyr * (p / GeV) / B16 / z2;
+}
+
+
 double dEdt_ionization(const double& n_HI, const double& E_k) {
 	double p_squared = pow2(gamma(E_k)) - 1.;
 	double beta_squared = pow2(beta(E_k));
@@ -76,10 +86,6 @@ double spectrum(const double& E_k) {
 	double p_0 = sqrt(E_k_0 * E_k_0 + 2. * mass_proton_c2 * E_k_0);
 	return 1. / beta * pow(p / p_0, -SN_slope);
 }
-
-/*double compute_source_normalization() {
-	return 0;
-}*/
 
 double min_star_forming_halo(const double& z) {
 	return 1e8 * mass_sun * pow(10. / (1.+z), 1.5);

@@ -2,16 +2,18 @@
 
 Reionization::Reionization(const string& init_filename_) {
     init_filename = init_filename_;
-    init_reionization();
-    init_grids();
     f_sfr = 4e-2;
     f_esc = 0.1;
+    SN_E_min = 100. * keV;
+    SN_E_max = 1. * TeV;
+    SN_slope = 2.2;
+    SN_E_size = 7 * 32;
     open_output_files();
     
-    double z = 20;
-    double M = min_star_forming_halo(z);
-    double SFR = f_sfr * Omega_b / (Omega_m - Omega_b) * M / free_fall_timescale(z, M);
-    cout << z << "\t" << M / mass_sun << "\t" << SN_efficiency * SN_kinetic_energy * SN_fraction * SFR / (erg / s) << "\n";
+    //double z = 20;
+    //double M = min_star_forming_halo(z);
+    //double SFR = f_sfr * Omega_b / (Omega_m - Omega_b) * M / free_fall_timescale(z, M);
+    //cout << z << "\t" << M / mass_sun << "\t" << SN_efficiency * SN_kinetic_energy * SN_fraction * SFR / (erg / s) << "\n";
 }
 
 Reionization::~Reionization() {
@@ -20,19 +22,19 @@ Reionization::~Reionization() {
 
 void Reionization::init_grids() {
     cout << "Init energ grids ...\n";
-    double deltaLogE = exp(log(SN_E_max / SN_E_min) / (E_size - 1));
-    for (size_t iE = 0; iE < E_size; ++iE) {
+    double deltaLogE = exp(log(SN_E_max / SN_E_min) / (SN_E_size - 1));
+    for (size_t iE = 0; iE < SN_E_size; ++iE) {
         double E_k_ = exp(log(SN_E_min) + iE * log(deltaLogE));
         E_k.push_back(E_k_);
-        Q_sn.push_back(spectrum(E_k_));
+        Q_sn.push_back(spectrum(E_k_, SN_slope));
     }
-    b_losses.resize(E_size);
-    N_cr.resize(E_size);
-    knownTerm.resize(E_size - 1);
-    diagonal.resize(E_size - 1);
-    upperDiagonal.resize(E_size - 2);
-    lowerDiagonal.resize(E_size - 2);
-    N_next.resize(E_size - 1);
+    b_losses.resize(SN_E_size);
+    N_cr.resize(SN_E_size);
+    knownTerm.resize(SN_E_size - 1);
+    diagonal.resize(SN_E_size - 1);
+    upperDiagonal.resize(SN_E_size - 2);
+    lowerDiagonal.resize(SN_E_size - 2);
+    N_next.resize(SN_E_size - 1);
 }
 
 void Reionization::init_reionization() {
@@ -46,8 +48,8 @@ void Reionization::init_reionization() {
     ionization_rate = 0;
     ionization_rate_CR = 0;
     recombination_rate = 0;
-    normalization_integral = compute_spectrum_normalization(reference_energy, SN_E_min, SN_E_max, SN_slope);
     optical_depth_PLANCK = 0.055 + 3. * 0.009;
+    normalization_integral = compute_spectrum_normalization(reference_energy, SN_E_min, SN_E_max, SN_slope);
     //double initial_tau = compute_initial_tau(initial_redshift);
 }
 
@@ -105,7 +107,7 @@ double Reionization::hmf_integral_interpolate(const double& x) {
 
 
 void Reionization::build_losses() {
-    for (size_t iE = 0; iE < E_size; ++iE) {
+    for (size_t iE = 0; iE < SN_E_size; ++iE) {
         double E_k_iE = E_k.at(iE);
         double dEdt = dEdt_adiabatic(z, E_k_iE);
         dEdt += dEdt_ionization(n_HI, E_k_iE);
@@ -136,8 +138,6 @@ void Reionization::evolve_IGM(const double& dt) {
     T_k -= dT_k_dz * dz;
     
     optical_depth += SIGMAT * n_e * c_light * -dt;
-    
-    return;
 }
 
 double Reionization::compute_ionization_rate_CR() {
@@ -171,11 +171,11 @@ void Reionization::evolve_CR(const double& dt) {
     
     build_losses();
     
-    for (size_t iE = 0; iE < E_size - 1; ++iE) {
+    for (size_t iE = 0; iE < SN_E_size - 1; ++iE) {
         double alpha2 = - fabs(dt) * b_losses.at(iE) / (E_k.at(iE+1) - E_k.at(iE));
         double alpha3 = - fabs(dt) * b_losses.at(iE+1) / (E_k.at(iE+1) - E_k.at(iE));
         diagonal.at(iE) = .5 * (1. + alpha2);
-        if (iE != E_size - 2)
+        if (iE != SN_E_size - 2)
             upperDiagonal.at(iE) = .5 * (1. - alpha3);
         if (iE != 0)
             lowerDiagonal.at(iE - 1) = 0;
@@ -186,7 +186,7 @@ void Reionization::evolve_CR(const double& dt) {
     
     gsl_linalg_solve_tridiag(diagonal, upperDiagonal, lowerDiagonal, knownTerm, N_next);
     
-    for (size_t iE = 0; iE < E_size - 1; ++iE) {
+    for (size_t iE = 0; iE < SN_E_size - 1; ++iE) {
         N_cr.at(iE) = max(N_next.at(iE), 0.);
     }
     
@@ -195,7 +195,7 @@ void Reionization::evolve_CR(const double& dt) {
     
     //cout << dt << "\t" << *min_element(N_cr.begin(),N_cr.end()) << "\t" << *max_element(N_cr.begin(),N_cr.end()) << "\n";
     
-    return; //max_difference;
+    return;
 }
 
 void Reionization::plot_source_function(const double& z) {
@@ -238,7 +238,8 @@ void Reionization::evolve(const bool& doCR) {
         
         if (counter % (int)(0.1/dz) == 0) {
             print_status(false);
-            dump_N(z);
+            if (doCR)
+                dump_N(z);
         }
     }
     cout << "... end in " << 1 << " s.\n";

@@ -31,6 +31,8 @@ public:
 		this->vvir_cut = vvir_cut;
 	}
 
+    void print_mean_halo_distance();
+
 private:
     double integrate_hmf(double z, const double& M_min, const double& M_max);
     double efficiency;
