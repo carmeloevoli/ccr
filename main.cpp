@@ -34,17 +34,21 @@ int main() {
 
 		R->read_SFR("SFR_new_100.txt");
 
-		R->init_reionization();
-
-		R->set_dz(1e-7);
+        R->set_dz(1e-7);
 
 		R->set_f_sfr(0.02);
 
 		R->set_f_esc(1e-2);
-        
-        //R->plot_source_function(10);
 
-        R->evolve(true);
+        R->set_SN_slope(2.0);
+
+        R->init_grids();
+        
+        R->init_reionization();
+        
+        R->plot_source_function(10);
+
+        //R->evolve(true);
 
 		delete R;
 	}

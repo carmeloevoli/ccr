@@ -12,7 +12,6 @@ double Bohm_diffusion(const double& z, const double& E_k) {
     return 1.1 * pow2(Mpc) / Gyr * (p / GeV) / B16 / z2;
 }
 
-
 double dEdt_ionization(const double& n_HI, const double& E_k) {
 	double p_squared = pow2(gamma(E_k)) - 1.;
 	double beta_squared = pow2(beta(E_k));
@@ -79,7 +78,10 @@ double UV_mean_free_path(const double& z) {
 	return 3.9 * Mpc * pow((1. + z) / 4., -5.0); // 4.5
 }
 
-double spectrum(const double& E_k) {
+double spectrum(const double& E_k, const double& SN_slope) {
+    
+    cout << SN_slope << "\n";
+    
 	double p = sqrt(E_k * E_k + 2. * mass_proton_c2 * E_k);
     double beta = p / (E_k + mass_proton_c2);
 	double E_k_0 = reference_energy;
@@ -118,7 +120,7 @@ void print_timescales(string filename, const double& z) {
 	outfile << scientific << setprecision(3);
 	for (double E_k = MeV; E_k < 200. * GeV; E_k *= 1.2) {
 		outfile << E_k / GeV << "\t" << fast::t_hubble(z) << "\t";
-		outfile << spectrum(E_k) << "\t";
+		//outfile << spectrum(E_k) << "\t";
 		outfile << E_k / dEdt_ionization(n_HI, E_k) << "\t";
 		outfile << E_k / dEdt_coulomb_Galprop(n_e, E_k) << "\t" << E_k / dEdt_coulomb(n_e, E_k) << "\t";
 		outfile << E_k / dEdt_adiabatic(z, E_k) << "\t" ;

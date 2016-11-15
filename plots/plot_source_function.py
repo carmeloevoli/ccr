@@ -61,6 +61,11 @@ data = read_file('output/test_new_2_10_spectrum.txt',0,1,2)
 
 plt.plot(data[0] / GeV, data[0]**2.0 * data[1] * data[2], 'b', label=r'$\alpha = 2$')
 
+data = read_file('output/test_new_2.0_spectrum.txt',0,1,2)
+
+plt.plot(data[0] / GeV, data[0]**2.0 * data[1] * data[2], 'm--', label=r'$\alpha = 2$')
+
+
 data = read_file('output/test_new_2.2_10_spectrum.txt',0,1,2)
 
 plt.plot(data[0] / GeV, data[0]**2.0 * data[1] * data[2], 'g', label=r'$\alpha = 2.2$')
@@ -74,6 +79,6 @@ plt.legend(loc='lower right',frameon=False,fontsize=26)
 plt.xlim([1e-3,1e2])
 plt.ylim([5e-36,.2e-32])
 
-plt.savefig('source_function_z10.pdf',format='pdf',dpi=300)
+#plt.savefig('source_function_z10.pdf',format='pdf',dpi=300)
 
-#plt.show()
+plt.show()

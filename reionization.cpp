@@ -51,6 +51,7 @@ void Reionization::init_reionization() {
     optical_depth_PLANCK = 0.055 + 3. * 0.009;
     normalization_integral = compute_spectrum_normalization(reference_energy, SN_E_min, SN_E_max, SN_slope);
     //double initial_tau = compute_initial_tau(initial_redshift);
+    cout << "... normalization integral is " << normalization_integral << "\n";
 }
 
 void Reionization::read_SFR(const string& filename) {
@@ -199,6 +200,7 @@ void Reionization::evolve_CR(const double& dt) {
 }
 
 void Reionization::plot_source_function(const double& z) {
+    cout << "Plotting source function ...\n";
     
     star_formation_rate_comoving = f_sfr * Omega_b / (Omega_m - Omega_b) * hmf_integral_interpolate(z); // M V^-1 T^-1
     star_formation_rate_physical = star_formation_rate_comoving * pow3(1. + z); // M V^-1 T^-1
@@ -206,12 +208,10 @@ void Reionization::plot_source_function(const double& z) {
     cz = sn_energy_rate / pow2(reference_energy) / normalization_integral; // E^-1 V^-1 T^-1
     
     open_spectrum_file(z);
-    
     fout_spectrum << "#E [erg] - Q [] - Cz [erg-1 cm-3 s-1] \n";
-    for (size_t iE = 0; iE < E_size - 1; ++iE) {
+    for (size_t iE = 0; iE < SN_E_size - 1; ++iE) {
         fout_spectrum << setprecision(5) << scientific << E_k.at(iE) << "\t" << Q_sn.at(iE) << "\t" << cz << "\n";
     }
-    
     close_spectrum_file();
 }
 
