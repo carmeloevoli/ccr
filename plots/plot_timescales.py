@@ -76,6 +76,6 @@ plt.plot(t_H[0],t_f[1]/t_H[1],'m--')
 
 plt.legend(loc='upper right')
 
-#plt.show()
+plt.show()
 
-plt.savefig('timescales.pdf', format='pdf', bbox_inches='tight', dpi=300)
+#plt.savefig('timescales.pdf', format='pdf', bbox_inches='tight', dpi=300)

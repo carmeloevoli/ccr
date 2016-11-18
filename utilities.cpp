@@ -46,6 +46,7 @@ double dEdt_pp(const double& n_H, const double& E_k) {
 }
 
 double dEdt_adiabatic(const double& z, const double& E_k) {
+    //const double A = (E_k * (E_k + 2.0 * ))
 	const double dzdt = 1. / fast::dtdz(z);
 	return -dzdt / (1. + z) * E_k;
 }
@@ -76,17 +77,6 @@ double UV_mean_free_path(const double& z) {
 	//double lambda_ll = c_light / fast::hubble(z) / (1. + z) / measurement;
 	//return lambda_ll / sqrt(M_PI);
 	return 3.9 * Mpc * pow((1. + z) / 4., -5.0); // 4.5
-}
-
-double spectrum(const double& E_k, const double& SN_slope) {
-    
-    cout << SN_slope << "\n";
-    
-	double p = sqrt(E_k * E_k + 2. * mass_proton_c2 * E_k);
-    double beta = p / (E_k + mass_proton_c2);
-	double E_k_0 = reference_energy;
-	double p_0 = sqrt(E_k_0 * E_k_0 + 2. * mass_proton_c2 * E_k_0);
-	return 1. / beta * pow(p / p_0, -SN_slope);
 }
 
 double min_star_forming_halo(const double& z) {
@@ -129,16 +119,25 @@ void print_timescales(string filename, const double& z) {
 	outfile.close();
 }
 
+double spectrum(const double& E_k, const double& SN_slope) {
+    double p = sqrt(E_k * E_k + 2. * mass_proton_c2 * E_k);
+    double beta = p / (E_k + mass_proton_c2);
+    double E_k_0 = reference_energy;
+    double p_0 = sqrt(E_k_0 * E_k_0 + 2. * mass_proton_c2 * E_k_0);
+    
+    return 1. / beta * pow(p / p_0, -SN_slope);
+}
+
 double I_spectrum(double x, void * params) {
 	double alpha = *(double *) params;
 	double E_0 = *((double *)params + 1);
-	double f = x * pow((E_0 * x * x + 2. * mass_proton_c2 * x) / (E_0 + 2. * mass_proton_c2), - .5 * alpha);
-	return f;
+    double E = x * E_0;
+	//double f = x * pow((E_0 * x * x + 2. * mass_proton_c2 * x) / (E_0 + 2. * mass_proton_c2), - .5 * alpha);
+	return x * spectrum(E, alpha);
 }
 
 double compute_spectrum_normalization(double E_0, double E_min, double E_max, double alpha) {
-
-	gsl_integration_workspace * w
+    gsl_integration_workspace * w
 	= gsl_integration_workspace_alloc (10000);
 
 	double result, error;

@@ -46,59 +46,76 @@ def read_file(datafile,xcol,ycol):
 plt.yscale('log')
 plt.xscale('log')
 
-plt.xlabel(r'$E$ [GeV]',fontsize=30)
-plt.ylabel(r'$E^2$ N$_p$ [erg]',fontsize=30)
+plt.title(r'$\alpha = 2.2$',fontsize=30,y=1.02)
+plt.xlabel(r'$E$ [GeV]',fontsize=30,labelpad=10)
+plt.ylabel(r'$E^2$ N$_{\rm p}$ [erg]',fontsize=30,labelpad=10)
 
 plt.axis()#[1e7,1e11,1e3,1e9],interpolation='none')
 
 alpha = 2.
 GeV = 1. / 624.151
 
-data = read_file('output/test_with_CR_1_MeV_spectra_224_at_20_fesc_0.0002_fsfr_0.04.txt',0,1)
-plt.plot(data[0]/GeV,data[0]**alpha*data[1],'r',label=r'$z=20$')
+def plot_and_fit(filename,color,label):
+    x, y = np.loadtxt(filename, skiprows=1, usecols=(0,1), unpack=True)
+    plt.plot(x / GeV, x**alpha * y, color=color, label=label)
+    i = (x > 0.04 * GeV).nonzero()
+    x, y = x[i], y[i]
+    i = (x < 2 * GeV).nonzero()
+    x, y = x[i], y[i]
+    m, b = np.polyfit(np.log(x), np.log(y), 1)
+    x = np.logspace(-7,3,100)
+    y = np.exp(b) * x**m
+    plt.plot(x / GeV, x**alpha * y, color=color, linestyle='--')
 
-data = read_file('output/test_with_CR_100_keV_spectra_224_at_20_fesc_0.0002_fsfr_0.04.txt',0,1)
-plt.plot(data[0]/GeV,data[0]**alpha*data[1],'r--')
 
-data = read_file('output/test_with_CR_10_keV_spectra_256_at_20_fesc_0.0002_fsfr_0.04.txt',0,1)
-plt.plot(data[0]/GeV,data[0]**alpha*data[1],'r:')
+#data = read_file('output/test_with_CR_1_MeV_spectra_224_at_20_fesc_0.0002_fsfr_0.04.txt',0,1)
+#plt.plot(data[0]/GeV,data[0]**alpha*data[1],'r',label=r'$z=20$')
+
+#data = read_file('output/test_with_CR_100_keV_spectra_224_at_20_fesc_0.0002_fsfr_0.04.txt',0,1)
+#plt.plot(data[0]/GeV,data[0]**alpha*data[1],'r--')
+
+#data = read_file('output/test_with_CR_10_keV_spectra_256_at_20_fesc_0.0002_fsfr_0.04.txt',0,1)
+#plt.plot(data[0]/GeV,data[0]**alpha*data[1],'r:')
 
 #data = read_file('output/test_with_CR_no_losses_keV_spectra_224_at_20_fesc_0.0002_fsfr_0.04.txt',0,1)
 #plt.plot(data[0]/GeV,data[0]**alpha*data[1],'r--')
 
-data = read_file('output/test_with_CR_1_MeV_spectra_224_at_10_fesc_0.0002_fsfr_0.04.txt',0,1)
-plt.plot(data[0]/GeV,data[0]**alpha*data[1],'g',label=r'$z=10$')
+#data = read_file('output/test_with_CR_1_MeV_spectra_224_at_10_fesc_0.0002_fsfr_0.04.txt',0,1)
+#plt.plot(data[0]/GeV,data[0]**alpha*data[1],'g',label=r'$z=10$')
 
-data = read_file('output/test_with_CR_100_keV_spectra_224_at_10_fesc_0.0002_fsfr_0.04.txt',0,1)
-plt.plot(data[0]/GeV,data[0]**alpha*data[1],'g--')
+#data = read_file('output/test_with_CR_100_keV_spectra_224_at_10_fesc_0.0002_fsfr_0.04.txt',0,1)
+#plt.plot(data[0]/GeV,data[0]**alpha*data[1],'g--')
 
-data = read_file('output/test_with_CR_10_keV_spectra_256_at_10_fesc_0.0002_fsfr_0.04.txt',0,1)
-plt.plot(data[0]/GeV,data[0]**alpha*data[1],'g:')
+#data = read_file('output/test_with_CR_10_keV_spectra_256_at_10_fesc_0.0002_fsfr_0.04.txt',0,1)
+#plt.plot(data[0]/GeV,data[0]**alpha*data[1],'g:')
 
 #data = read_file('output/test_with_CR_no_losses_keV_spectra_224_at_10_fesc_0.0002_fsfr_0.04.txt',0,1)
 #plt.plot(data[0]/GeV,data[0]**alpha*data[1],'g--')
 
-data = read_file('output/test_with_CR_1_MeV_spectra_224_at_6_fesc_0.0002_fsfr_0.04.txt',0,1)
-plt.plot(data[0]/GeV,data[0]**alpha*data[1],'b',label=r'$z=6$')
+#data = read_file('output/test_with_CR_1_MeV_spectra_224_at_6_fesc_0.0002_fsfr_0.04.txt',0,1)
+#plt.plot(data[0]/GeV,data[0]**alpha*data[1],'b',label=r'$z=6$')
 
-data = read_file('output/test_with_CR_100_keV_spectra_224_at_6_fesc_0.0002_fsfr_0.04.txt',0,1)
-plt.plot(data[0]/GeV,data[0]**alpha*data[1],'b--')
+#data = read_file('output/test_with_CR_100_keV_spectra_224_at_6_fesc_0.0002_fsfr_0.04.txt',0,1)
+#plt.plot(data[0]/GeV,data[0]**alpha*data[1],'b--')
 
-data = read_file('output/test_with_CR_10_keV_spectra_256_at_6_fesc_0.0002_fsfr_0.04.txt',0,1)
-plt.plot(data[0]/GeV,data[0]**alpha*data[1],'b:')
+#data = read_file('output/test_with_CR_10_keV_spectra_256_at_6_fesc_0.0002_fsfr_0.04.txt',0,1)
+#plt.plot(data[0]/GeV,data[0]**alpha*data[1],'b:')
 
 #data = read_file('output/test_with_CR_no_losses_keV_spectra_224_at_6_fesc_0.0002_fsfr_0.04.txt',0,1)
 #plt.plot(data[0]/GeV,data[0]**alpha*data[1],'b--')
 
+#data = read_file('output/test_new_2.2_spectra_224_at_15_fesc_0.01_fsfr_0.02.txt',0,1)
+#plt.plot(data[0] / GeV, data[0]**alpha * data[1], 'b', label=r'$z=15$')
 
+#plot_and_fit('output/test_new_2.2_spectra_224_at_15_fesc_0.01_fsfr_0.02.txt','b',r'$z=15$')
+plot_and_fit('output/test_new_2.2_spectra_224_at_10_fesc_0.01_fsfr_0.02.txt','r',r'$z=10$')
+plot_and_fit('output/test_new_2.2_spectra_224_at_6_fesc_0.01_fsfr_0.02.txt','b',r'$z=6$')
 
+plt.legend(loc='upper left',fontsize=25, frameon=False)
 
+plt.xlim([1e-4,1e0])
+plt.ylim([1e-18,1e-13])
 
-plt.legend(loc='upper right',fontsize=24)
+plt.savefig('proton_evolution.pdf',format='pdf',dpi=300)
 
-plt.xlim([1e-5,1e0])
-plt.ylim([1e-20,1e-12])
-
-#plt.savefig('proton_evolution.pdf',format='pdf',dpi=300)
-
-plt.show()
+#plt.show()

@@ -84,4 +84,6 @@ plt.text(13,0.05,r'$f_{\rm esc} = 10^{-2}$',fontsize=25)
 plt.xlabel(r'z', size=26)
 plt.ylabel(r'$\tau_e$', size=26)
 
-plt.savefig('IGM_evolution.pdf', format='pdf', bbox_inches='tight', dpi=300)
+#plt.savefig('IGM_evolution.pdf', format='pdf', bbox_inches='tight', dpi=300)
+
+plt.show

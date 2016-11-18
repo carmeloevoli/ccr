@@ -21,7 +21,7 @@ Reionization::~Reionization() {
 }
 
 void Reionization::init_grids() {
-    cout << "Init energ grids ...\n";
+    cout << "Init energy grids ...\n";
     double deltaLogE = exp(log(SN_E_max / SN_E_min) / (SN_E_size - 1));
     for (size_t iE = 0; iE < SN_E_size; ++iE) {
         double E_k_ = exp(log(SN_E_min) + iE * log(deltaLogE));
@@ -49,7 +49,7 @@ void Reionization::init_reionization() {
     ionization_rate_CR = 0;
     recombination_rate = 0;
     optical_depth_PLANCK = 0.055 + 3. * 0.009;
-    normalization_integral = compute_spectrum_normalization(reference_energy, SN_E_min, SN_E_max, SN_slope);
+    normalization_integral = compute_spectrum_normalization(reference_energy, SN_E_min, /*SN_E_max*/1e6 * GeV, SN_slope);
     //double initial_tau = compute_initial_tau(initial_redshift);
     cout << "... normalization integral is " << normalization_integral << "\n";
 }

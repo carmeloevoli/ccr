@@ -10,13 +10,17 @@ double sigma_norm, R, theta_cmb, omhh, z_equality, y_d, sound_horizon, alpha_nu,
 
 #define v(A) (r*r+1.)
 
+void simple_main();
+
 int main() {
 
 	bool doSFR = false;
 	bool doReionization = true;
 
 	fast::init_ps();
-
+    
+    simple_main();
+    
 	if (doSFR) {
 		SFR* S = new SFR("SFR_new_60.txt");
 
@@ -30,7 +34,7 @@ int main() {
 	}
 
 	if (doReionization) {
-		Reionization* R = new Reionization("test_new_2.0");
+		Reionization* R = new Reionization("test_new_2.5");
 
 		R->read_SFR("SFR_new_100.txt");
 
@@ -40,15 +44,15 @@ int main() {
 
 		R->set_f_esc(1e-2);
 
-        R->set_SN_slope(2.0);
+        R->set_SN_slope(2.5);
 
         R->init_grids();
         
         R->init_reionization();
         
-        R->plot_source_function(10);
+        //R->plot_source_function(10);
 
-        //R->evolve(true);
+        R->evolve(true);
 
 		delete R;
 	}
@@ -58,26 +62,25 @@ int main() {
 
 void simple_main() {
 
-	cout << Omega_b / Omega_m << "\n";
+	//cout << Omega_b / Omega_m << "\n";
 
-	double z = 20.;
+	//double z = 20.;
 
-	double M = min_star_forming_halo(z);
+	//double M = min_star_forming_halo(z);
 
-	cout << z << "\t" << M / mass_sun << "\t" << free_fall_timescale(z,M) << "\n";
-	exit(1);
-
+	//cout << z << "\t" << M / mass_sun << "\t" << free_fall_timescale(z,M) << "\n";
+	
 	double alpha = 2.5;
 
-	double E_0 = 100. * GeV;
+	double E_0 = 1.0 * GeV;
 
 	cout << alpha << "\t";
 
-	cout << compute_spectrum_normalization(E_0, 10. * keV, 1. * GeV, alpha) << "\t";
+	cout << compute_spectrum_normalization(E_0, 10. * keV, .01 * GeV, alpha) << "\t";
 
-	cout << compute_spectrum_normalization(E_0, 10. * keV, 1e6 * GeV, alpha) << "\t";
+    cout << compute_spectrum_normalization(E_0, 10. * keV, 1e6 * GeV, alpha) << "\t";
 
-	cout << compute_spectrum_normalization(E_0, 10. * keV, 1. * GeV, alpha) / compute_spectrum_normalization(E_0, 10. * keV, 1e6 * GeV, alpha) * 100.;
+	cout << compute_spectrum_normalization(E_0, 10. * keV, .01 * GeV, alpha) / compute_spectrum_normalization(E_0, 10. * keV, 1e6 * GeV, alpha) * 100.;
 
 	cout << "\n";
 
@@ -95,14 +98,14 @@ void simple_main() {
 
 	//print_timescales("output/timescales_at_z20.txt", 20);
 
-	exit(1);
-
 	//for (double z = 0; z < 30; z += 1) {
 	//double l = UV_mean_free_path(z);
 	//cout << z << "\t" << l / Mpc << "\t" << c_light / sqrt(M_PI) / l / fast::hubble(z) / (1+z) << "\t" << 39. * pow((1. + z) / 4., -4.5) << "\n";
 	//}
 
-	cout << 1. / H_0 / sqrt(Omega_m) / n_H_0 << "\n";
+	//cout << 1. / H_0 / sqrt(Omega_m) / n_H_0 << "\n";
+
+    exit(1);
 
 	return;
 }
