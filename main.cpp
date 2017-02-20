@@ -19,7 +19,7 @@ int main() {
 
 	fast::init_ps();
     
-    simple_main();
+    //simple_main();
     
 	if (doSFR) {
 		SFR* S = new SFR("SFR_new_60.txt");
@@ -34,7 +34,7 @@ int main() {
 	}
 
 	if (doReionization) {
-		Reionization* R = new Reionization("test_new_2.5");
+		Reionization* R = new Reionization("test_new_2.2");
 
 		R->read_SFR("SFR_new_100.txt");
 
@@ -44,7 +44,7 @@ int main() {
 
 		R->set_f_esc(1e-2);
 
-        R->set_SN_slope(2.5);
+        R->set_SN_slope(2.2);
 
         R->init_grids();
         

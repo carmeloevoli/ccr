@@ -77,12 +77,12 @@ def plot_SFR(data,color):
     sfr_lo = data[3]
     plt.errorbar(z, sfr, xerr=dz_lo, yerr=sfr_lo, fmt='D', markersize='8', elinewidth=2, capsize=6, capthick=2, color=color, label='Madau \& Dickinson 2014')
 
-def plot_SFR_theory(filename,fs,color,label):
+def plot_SFR_theory(filename,fs,linestyle,label):
     mass_sun = 1.989e33
     Mpc = 3.0856775807e24
     yr = 3.14e7
     data = read_output_file(filename,0,2)
-    plt.plot(data[0],np.log10(fs * data[1] / (mass_sun / Mpc**3 / yr)), color = color)
+    plt.plot(data[0],np.log10(fs * data[1] / (mass_sun / Mpc**3 / yr)), linestyle)
 
 
 #data = read_SFR("SFR_IR_Madau14.txt")
@@ -91,19 +91,19 @@ def plot_SFR_theory(filename,fs,color,label):
 
 data = read_SFR("SFR_UV_Madau14.txt")
 
-plot_SFR(data,'k')
+plot_SFR(data,'r')
 
 fs = 0.01
 
-plot_SFR_theory('ccr/SFR_new_60.txt',fs,'g','$V_c = 30$ km/s')
+plot_SFR_theory('ccr/SFR_new_60.txt',fs,'b:','$V_c = 30$ km/s')
 
 fs = 0.012
 
-plot_SFR_theory('ccr/SFR_new_100.txt',fs,'b','$V_c = 50$ km/s')
+plot_SFR_theory('ccr/SFR_new_100.txt',fs,'b--','$V_c = 50$ km/s')
 
 fs = 0.021
 
-plot_SFR_theory('ccr/SFR_new_200.txt',fs,'r','$V_c = 100$ km/s')
+plot_SFR_theory('ccr/SFR_new_200.txt',fs,'b-','$V_c = 100$ km/s')
 
 #plot_SFR_theory('ccr/SFR.txt',fs,'m','$V_c = 0$ km/s')
 

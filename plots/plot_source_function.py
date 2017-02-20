@@ -49,7 +49,6 @@ def read_file(datafile,xcol,ycol,zcol):
 plt.yscale('log')
 plt.xscale('log')
 
-plt.title(r'$z=10$',fontsize=32)
 plt.xlabel(r'$E$ [GeV]',fontsize=32)
 plt.ylabel(r'$E^2$ q$_{\rm p}$ [erg cm$^{-3}$ s$^{-1}$]',fontsize=32)
 
@@ -63,7 +62,7 @@ plt.plot(data[0] / GeV, data[0]**2.0 * data[1] * data[2], 'b', label=r'$\alpha =
 
 data = read_file('output/test_new_2.0_spectrum.txt',0,1,2)
 
-plt.plot(data[0] / GeV, data[0]**2.0 * data[1] * data[2], 'm--', label=r'$\alpha = 2$')
+#plt.plot(data[0] / GeV, data[0]**2.0 * data[1] * data[2], 'm--', label=r'$\alpha = 2$')
 
 
 data = read_file('output/test_new_2.2_10_spectrum.txt',0,1,2)
@@ -79,6 +78,9 @@ plt.legend(loc='lower right',frameon=False,fontsize=26)
 plt.xlim([1e-3,1e2])
 plt.ylim([5e-36,.2e-32])
 
-#plt.savefig('source_function_z10.pdf',format='pdf',dpi=300)
+
+plt.text(0.004, 1e-33, r'$z=10$', fontsize=32)
+
+plt.savefig('source_function_z10.pdf',format='pdf',dpi=300)
 
 plt.show()

@@ -46,7 +46,6 @@ def read_file(datafile,xcol,ycol):
 plt.yscale('log')
 plt.xscale('log')
 
-plt.title(r'$\alpha = 2.2$',fontsize=30,y=1.02)
 plt.xlabel(r'$E$ [GeV]',fontsize=30,labelpad=10)
 plt.ylabel(r'$E^2$ N$_{\rm p}$ [erg]',fontsize=30,labelpad=10)
 
@@ -108,11 +107,15 @@ def plot_and_fit(filename,color,label):
 #plt.plot(data[0] / GeV, data[0]**alpha * data[1], 'b', label=r'$z=15$')
 
 #plot_and_fit('output/test_new_2.2_spectra_224_at_15_fesc_0.01_fsfr_0.02.txt','b',r'$z=15$')
-plot_and_fit('output/test_new_2.2_spectra_224_at_10_fesc_0.01_fsfr_0.02.txt','r',r'$z=10$')
-plot_and_fit('output/test_new_2.2_spectra_224_at_6_fesc_0.01_fsfr_0.02.txt','b',r'$z=6$')
+
+#plot_and_fit('output/test_new_2.2_spectra_224_at_10_fesc_0.01_fsfr_0.02.txt','r',r'$z=10$')
+#plot_and_fit('output/test_new_2.2_spectra_224_at_6_fesc_0.01_fsfr_0.02.txt','b',r'$z=6$')
 
 plt.legend(loc='upper left',fontsize=25, frameon=False)
 
+#plt.title(r'$\alpha = 2.2$',fontsize=30,y=1.02)
+
+plt.text(0.08,3e-18,r'$\alpha = 2.2$',fontsize=24)
 plt.xlim([1e-4,1e0])
 plt.ylim([1e-18,1e-13])
 
