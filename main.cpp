@@ -34,11 +34,11 @@ int main() {
 	}
 
 	if (doReionization) {
-		Reionization* R = new Reionization("test_new_2.2");
+		Reionization* R = new Reionization("test_fin_2.2");
 
 		R->read_SFR("SFR_new_100.txt");
 
-        R->set_dz(1e-7);
+        R->set_dz(1e-6);
 
 		R->set_f_sfr(0.02);
 

@@ -31,22 +31,36 @@ def plot_ionization():
     plt.ylabel(r'Ionization Rate [Myr$^{-1}$]', size=25)
     plt.ylim([1e-9,1e-2])
 
-    filename = 'output/test_new_2.0_igm.txt'
-    z, pion, crion = np.loadtxt(filename, skiprows=1, usecols=(0,6,7), unpack=True)
-    plt.plot(z, pion, 'k--')
-    plt.text(7,2e-4,'UV',fontsize=24)
-    plt.plot(z, crion * 1.4, 'r', label=r'$\alpha = 2$')
+#    filename = 'output/test_new_2.0_igm.txt'
+#    z, pion, crion = np.loadtxt(filename, skiprows=1, usecols=(0,6,7), unpack=True)
+#    plt.plot(z, pion, 'k--')
+#    plt.text(7,2e-4,'UV',fontsize=24)
+#    plt.plot(z, crion * 1.4, 'r', label=r'$\alpha = 2$')
 
-    filename = 'output/test_new_2.2_igm.txt'
-    z, pion, crion = np.loadtxt(filename, skiprows=1, usecols=(0,6,7), unpack=True)
-    plt.plot(z, crion * 1.4, 'b', label=r'$\alpha = 2.2$')
+#    filename = 'output/test_new_2.2_igm.txt'
+#    z, pion, crion = np.loadtxt(filename, skiprows=1, usecols=(0,6,7), unpack=True)
+#    plt.plot(z, crion * 1.4, 'b', label=r'$\alpha = 2.2$')
 
-#   filename = 'output/test_new_2.5_igm.txt'
-#z, pion, crion = np.loadtxt(filename, skiprows=1, usecols=(0,6,7), unpack=True)
-
-#   plt.plot(z, crion * 1.4, 'g', label=r'$\alpha = 2.5$')
+#    filename = 'output/test_new_2.5_igm.txt'
+#    z, pion, crion = np.loadtxt(filename, skiprows=1, usecols=(0,6,7), unpack=True)
+#    plt.plot(z, crion * 1.4, 'g', label=r'$\alpha = 2.5$')
 
 #    plt.legend(loc='upper right',fontsize=24,frameon=False)
+
+
+def plot_tigm():
+    plt.ylabel(r'$T_{\rm IGM}$ [K]', size=25)
+#plt.ylim([1e-9,1e-2])
+
+    filename = 'output/test_fin_2.2_igm.txt'
+    z, y = np.loadtxt(filename, skiprows=1, usecols=(0,2), unpack=True)
+    plt.plot(z, y, 'r')
+
+    filename = 'output/test_new_2.2_igm.txt'
+    z, y = np.loadtxt(filename, skiprows=1, usecols=(0,2), unpack=True)
+    plt.plot(z, y, 'b--')
+    
+    plt.plot(z, (1.+z)*2.725, 'k--')
 
 def plot_heating():
     plt.ylabel(r'$\Delta T_{\rm IGM}$ [K]', size=25)
@@ -66,18 +80,22 @@ def plot_heating():
     
     filename = 'output/test_new_2.2_igm.txt'
     z, y = np.loadtxt(filename, skiprows=1, usecols=(0,10), unpack=True)
+    Hz = H0 * np.sqrt(OMm * (1. + z)**3 + OMr * (1. + z)**4 + OMl);
     dT = 2. / 3. / kB / Hz * np.array(y) / 3.14e13 # kelvin / erg * s * erg / Myr
     plt.plot(z, 1.2 * dT, 'b', label=r'$\alpha = 2.2$')
 
-    #filename = 'output/test_new_2.5_igm.txt'
-    #z, y = np.loadtxt(filename, skiprows=1, usecols=(0,10), unpack=True)
-    #dT = 2. / 3. / kB / Hz * np.array(y) / 3.14e13 # kelvin / erg * s * erg / Myr
-    #plt.plot(z, 1.2 * dT, 'g', label=r'$\alpha = 2.5$')
+#filename = 'output/test_new_2.5_igm.txt'
+#    z, y = np.loadtxt(filename, skiprows=1, usecols=(0,10), unpack=True)
+#    dT = 2. / 3. / kB / Hz * np.array(y) / 3.14e13 # kelvin / erg * s * erg / Myr
+#    plt.plot(z, 1.2 * dT, 'g', label=r'$\alpha = 2.5$')
 
-    plt.plot(z,(1.+z)*2.725,'k--')
-    plt.text(7,8,r'$T_{\rm CMB}$',fontsize=23)
+#   plt.plot(z,(1.+z)*2.725,'k--')
+    
+    #    plt.plot(z,((1.+z)/49.)**2.*40.,'k:')
+    
+    #plt.text(7,8,r'$T_{\rm CMB}$',fontsize=23)
 
-    plt.legend(loc='upper right',fontsize=21,frameon=False)
+#plt.legend(loc='upper right',fontsize=21,frameon=False)
 
 
 #Ionization
@@ -92,7 +110,9 @@ plt.xlim([6,15])
 plt.setp(ax1.get_yticklabels(), fontsize=26)
 plt.setp(ax1.get_xticklabels(), visible=False)
 
-plot_ionization()
+#plot_ionization()
+
+plot_tigm()
 
 #Heating
 ax2 = plt.subplot(212, sharex=ax1)
@@ -110,6 +130,6 @@ plot_heating()
 
 plt.show()
 
-#plt.savefig('heating_rate.pdf', format='pdf', dpi=300)
+#plt.savefig('cr_igm_rates.pdf', format='pdf', dpi=300)
 
 #plt.savefig('ionization_rate.pdf', format='pdf', dpi=300)

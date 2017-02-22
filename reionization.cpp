@@ -133,10 +133,12 @@ void Reionization::evolve_IGM(const double& dt) {
     heating_rate = B * (13.6 * eV) * UV_photoionization_cs * UV_mean_free_path(z) * f_esc *  PopII_dNdM * star_formation_rate_physical * (1. - x_II); // E / T
     
     double dx_II = dt * (ionization_rate - recombination_rate); // cm^3 s^-1 cm^-3;
-    double dT_k_dz = 2. * T_k / (1. + z) - T_k / (1. + x_II) * (dx_II / dz) + 2. / 3. / k_boltzmann / (1. + x_II) * fast::dtdz(z) * heating_rate ;
+    double dT_k_dz = 2. * T_k / (1. + z) - T_k / (1. + x_II) * (dx_II / dz) + 2. / 3. / k_boltzmann / (1. + x_II) * fast::dtdz(z) * (heating_rate + heating_rate_CR);
     
     x_II -= dx_II;
     T_k -= dT_k_dz * dz;
+    
+    //dT_k_dz = 2. * T_k / (1. + z) - T_k / (1. + x_II) * (dx_II / dz) + 2. / 3. / k_boltzmann / (1. + x_II) * fast::dtdz(z) * 0.;
     
     optical_depth += SIGMAT * n_e * c_light * -dt;
 }
@@ -230,7 +232,7 @@ void Reionization::evolve(const bool& doCR) {
         double dt = fast::dtdz(z) * dz;
         
         evolve_IGM(dt);
-        
+                
         if (doCR)
             evolve_CR(dt);
         

@@ -47,7 +47,7 @@ void Reionization::dump_N(const double& z) {
 void Reionization::print_status(bool doTitle) {
     if (doTitle) {
         fout_losses << "#z - x_II - t_I[E_0] - t_C[E_0] - t_a[E_0] - t_I[E_1] - t_C[E_1] - t_a[E_1] - t_H" << "\n";
-        fout_igm << "#z - x_II - T_k[K] - optical_depth - SFR [M_sun Mpc^-3 yr^-1] - Ion Rate [Myr^-1] - Rec Rate [Myr^-1]" << "\n";
+        fout_igm << "#z - x_II - T_k[K] - T_k(n)[K] - optical_depth - SFR [M_sun Mpc^-3 yr^-1] - Ion Rate [Myr^-1] - Rec Rate [Myr^-1]" << "\n";
     }
     else if (z > 0) {
         double E_k, dEdt_tot;
