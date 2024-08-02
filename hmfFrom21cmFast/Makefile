@@ -1,7 +1,8 @@
 # C compiler and flags
+GSL_DIR  = /usr/local/Cellar/gsl/2.8
 CPPFLAGS = -I${GSL_DIR}/include 
 LDFLAGS  = -L${GSL_DIR}/lib -lgsl -lgslcblas 
-CC       = /usr/local/Cellar/gcc/5.2.0/bin/gcc-5 -fopenmp
+CC       = /usr/local/Cellar/gcc/14.1.0_2/bin/gcc-14 -fopenmp
 
 # non-project dependencies
 COSMO_FILES = ps.o cosmo_progs.o misc.o 

@@ -1,5 +1,5 @@
-#ifndef COSMOLOGY_H
-#define COSMOLOGY_H
+#ifndef _COSMOLOGY_PARAMS_H_
+#define _COSMOLOGY_PARAMS_H_
 
 #include <cmath>
 

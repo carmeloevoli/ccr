@@ -1,15 +1,14 @@
-#ifndef CONSTANTS_H_
-#define CONSTANTS_H_
+#ifndef CCRH_CONSTANTS_H_
+#define CCRH_CONSTANTS_H_
 
 #include <cmath>
-#include <iostream>
-
-using namespace std;
 
 // pows
-#define pow2(A) ((A)*(A))
-#define pow3(A) ((A)*(A)*(A))
-#define pow4(A) ((A)*(A)*(A)*(A))
+#define pow2(A) ((A) * (A))
+#define pow3(A) ((A) * (A) * (A))
+#define pow4(A) ((A) * (A) * (A) * (A))
+
+namespace cgs {
 
 // CGS units
 static const double centimeter = 1;
@@ -17,28 +16,27 @@ static const double cm = centimeter;
 static const double gram = 1;
 static const double second = 1;
 static const double s = second;
-static const double dyne = 1;
 static const double erg = 1;
-static const double esu = 1;
-static const double gauss = 1;
-static const double kelvin = 1;
-static const double K = kelvin;
+static const double statC = 1;
+static const double Gauss = 1;
+static const double Kelvin = 1;
 
 // derived units
+static const double K = Kelvin;
 static const double meter = 1e2 * centimeter;
 static const double kilometer = 1e3 * meter;
 static const double km = kilometer;
 static const double cm2 = cm * cm;
 static const double cm3 = cm * cm * cm;
 static const double kilogram = 1e3 * gram;
-static const double newton = 1e5 * dyne;
 static const double joule = 1e7 * erg;
-static const double coulomb = 2997924580. * esu;
-static const double tesla = 1e4 * gauss;
-static const double microgauss = 1e-6 * gauss;
-static const double nanogauss = 1e-9 * gauss;
+static const double tesla = 1e4 * Gauss;
+static const double microgauss = 1e-6 * Gauss;
+static const double nanogauss = 1e-9 * Gauss;
 static const double muG = microgauss;
 static const double nG = nanogauss;
+static const double barn = 1e-24 * pow2(centimeter);
+static const double mbarn = 1e-27 * pow2(centimeter);
 
 // electron volt
 static const double electronvolt = 1.60217657e-12 * erg;
@@ -83,14 +81,18 @@ static const double mass_proton_c2 = mass_proton * c_light_squared;
 static const double mass_neutron = 1.67492735e-24 * gram;
 static const double mass_electron = 9.10938291e-28 * gram;
 static const double mass_electron_c2 = mass_electron * c_light_squared;
-static const double electron_radius = 2.8179409238e-13 * cm; /* e^2 / mc^2 classical electron radius. */
+static const double electron_radius =
+    2.8179409238e-13 * cm; /* e^2 / mc^2 classical electron radius. */
+static const double electron_charge = 4.80320425e-10 * statC;
 static const double mass_sun = 1.989e30 * kilogram;
 static const double h_planck = 6.62606957e-27 * erg * second;
 static const double h_bar_planck = h_planck / 2. / M_PI;
-static const double k_boltzmann = 1.3806488e-16 * erg / kelvin;
-static const double G = 6.67259e-8 * pow3(cm) / gram / pow2(second);
-static const double pi_re2_me_c2_c = M_PI * pow2(electron_radius) * c_light * mass_electron_c2; /* Pi * e^4 / mc */
-static const double pi_re_h_bar2_c2 = M_PI * electron_radius * pow2(h_bar_planck) * pow2(c_light); // erg^2* cm^3
+static const double k_boltzmann = 1.3806488e-16 * erg / Kelvin;
+static const double G_N = 6.67259e-8 * pow3(cm) / gram / pow2(second);
+static const double pi_re2_me_c2_c =
+    M_PI * pow2(electron_radius) * c_light * mass_electron_c2; /* Pi * e^4 / mc */
+static const double pi_re_h_bar2_c2 =
+    M_PI * electron_radius * pow2(h_bar_planck) * pow2(c_light);  // erg^2* cm^3
 
 static const double A_H = 1;
 static const double Z_H = 1;
@@ -114,15 +116,17 @@ static const double T_cmb = 2.728 * K;
 
 // PLANCK derived
 static const double H_0 = hlittle * 3.2407e-18 / s;
-static const double rho_crit = 3.0 * H_0 * H_0 / (8.0 * M_PI * G);  /* at z = 0 */
-static const double n_H_0 = rho_crit * Omega_b * (1.0 - Y_He) / mass_proton; /*  current hydrogen number density estimate ~1.92e-7 */
-static const double n_He_0 = rho_crit * Omega_b * Y_He / (4.0 * mass_proton); /*  current helium number density estimate */
-static const double f_H = n_H_0 / (n_H_0 + n_He_0); /* hydrogen number fraction */
+static const double rho_crit = 3.0 * H_0 * H_0 / (8.0 * M_PI * G_N); /* at z = 0 */
+static const double n_H_0 = rho_crit * Omega_b * (1.0 - Y_He) /
+                            mass_proton; /*  current hydrogen number density estimate ~1.92e-7 */
+static const double n_He_0 =
+    rho_crit * Omega_b * Y_He / (4.0 * mass_proton);  /*  current helium number density estimate */
+static const double f_H = n_H_0 / (n_H_0 + n_He_0);   /* hydrogen number fraction */
 static const double f_He = n_He_0 / (n_H_0 + n_He_0); /* helium number fraction */
 
 // source constants
 static const double reference_energy = 1. * GeV;
-//static const double SN_slope = 2.0;
+// static const double SN_slope = 2.0;
 static const double SN_efficiency = 0.1;
 static const double SN_kinetic_energy = 1e51 * erg;
 static const double SN_fraction = 0.01 / mass_sun;
@@ -131,10 +135,8 @@ static const double UV_photoionization_cs = 6.3e-18 * pow2(cm);
 static const double PopII_spectrum_slope = 5.;
 static const double PopII_dNdM = 8e60 / mass_sun;
 static const double clumping_factor = 2.;
-static const double B_IGM = 1e-16 * G;
+// static const double B_IGM = 1e-16 * Gauss;
 
-#include "cosmology_params.h"
-#include "anal_params.h"
-#include "heat_params.h"
+}  // namespace cgs
 
-#endif /* CONSTANTS_H_ */
+#endif /* CCRH_CONSTANTS_H_ */

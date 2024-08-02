@@ -1,5 +1,5 @@
-#ifndef _ANAL_PARAM_H_
-#define _ANAL_PARAM_H_
+#ifndef _ANAL_PARAMS_H_
+#define _ANAL_PARAMS_H_
 
 
 /******** BEGIN USER CHANGABLE DEFINITIONS   **********/

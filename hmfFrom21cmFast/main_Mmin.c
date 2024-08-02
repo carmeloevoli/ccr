@@ -26,15 +26,12 @@ int main(int argc, char ** argv)
      Reference: Sheth, Mo, Torman 2001
      */
     
-    double z = 20;
-    double M_min = 1e8 * pow(10. / (1.+z), 1.5);
-    double dNdM = -1;
-    
     printf ("#Redshift - Mass [Msun] - dNdM [Mpc^-3 Msun^-1]\n");
     
-    for (double M = M_min; M < 1e13; M *= 1.1){
-        dNdM = dNdM_st(z,M);
-        printf ("%5.2e %5.2e %5.2e\n", z, M, dNdM);
+    for (double z = 20; z > 0; z -= 0.1){
+        double M_min = 1e8 * pow(10. / (1. + z), 1.5);
+        double dNdM_min = dNdM_st(z, M_min);
+        printf ("%5.2e %5.2e %5.2e\n", z, M_min, dNdM);
     }
     
     return 0;

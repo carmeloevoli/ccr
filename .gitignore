@@ -1,3 +1,6 @@
-*.o
-*.txt
-a.out
+*.DS_Store
+*/a.out
+build/
+plots/*.pdf
+scratch/
+
