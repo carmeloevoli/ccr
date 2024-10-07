@@ -33,12 +33,6 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ffast-math")
 # Dependencies
 # ----------------------------------------------------------------------------
 
-# PLOG (provided)
-#include_directories(external/plog/include)
-
-# NamedType (provided)
-#include_directories(external/NamedType/include)
-
 # C++ Threads required
 #find_package(Threads REQUIRED)
 #list(APPEND CCRH_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
@@ -73,8 +67,8 @@ file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/output)
 #file(COPY ${CCRH_DATA} DESTINATION ${PROJECT_BINARY_DIR}/data)
 
 # make apps
-add_executable(sandbox apps/sandbox.cpp)
-target_link_libraries (sandbox CCRH ${CCRH_EXTRA_LIBRARIES})
+add_executable(run apps/main.cpp)
+target_link_libraries (run CCRH ${CCRH_EXTRA_LIBRARIES})
 
 # Show summary.
 message (STATUS "CMAKE_SYSTEM .......... = ${CMAKE_SYSTEM}")

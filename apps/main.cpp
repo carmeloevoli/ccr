@@ -1,111 +1,61 @@
+#include <fstream>
+#include <iomanip>  // For std::scientific and std::setprecision
 #include <iostream>
 
-#include "reionization.h"
-#include "SFR.h"
+#include "constants.h"
 #include "utilities.h"
 
-using namespace std;
+// Constants for z and file name
+const double Z_VALUE = 10.0;
+const std::string OUTPUT_FILE = "diffusion_time_output.txt";
 
-double sigma_norm, R, theta_cmb, omhh, z_equality, y_d, sound_horizon, alpha_nu, f_nu, f_baryon, beta_c, d2fact, R_CUTOFF, DEL_CURR, SIG_CURR;
-
-#define v(A) (r*r+1.)
-
-void simple_main();
-
-int main() {
-
-	bool doSFR = false;
-	bool doReionization = true;
-
-	fast::init_ps();
-    
-    //simple_main();
-    
-	if (doSFR) {
-		SFR* S = new SFR("SFR_new_60.txt");
-
-        S->set_vvir_cut(60. * km / s);
-        
-		//S->print_hmf(10, 1e6, 1e15);
-
-		S->evolve();
-
-		delete S;
-	}
-
-	if (doReionization) {
-		Reionization* R = new Reionization("test_fin_2.2");
-
-		R->read_SFR("SFR_new_100.txt");
-
-        R->set_dz(1e-6);
-
-		R->set_f_sfr(0.02);
-
-		R->set_f_esc(1e-2);
-
-        R->set_SN_slope(2.2);
-
-        R->init_grids();
-        
-        R->init_reionization();
-        
-        //R->plot_source_function(10);
-
-        R->evolve(true);
-
-		delete R;
-	}
-
-	return 0;
+// Function to open file and return output stream
+std::ofstream open_output_file(const std::string &filename) {
+    std::ofstream outfile(filename);
+    if (!outfile.is_open()) {
+        std::cerr << "Error: Could not open file " << filename << " for writing." << std::endl;
+        throw std::ios_base::failure("Failed to open output file.");
+    }
+    return outfile;
 }
 
-void simple_main() {
+// Main function to print diffusion time
+void print_diffusion_time() {
+    try {
+        std::ofstream outfile = open_output_file(OUTPUT_FILE);
 
-	//cout << Omega_b / Omega_m << "\n";
+        const auto z = Z_VALUE;
+        const auto B_IGM = 1e-16 * cgs::Gauss;
+        const auto n_H = n_H_physical(z);
+        const auto d = cgs::Mpc / (1. + z);
+        const auto j = dtdz(z);
 
-	//double z = 20.;
+        // Loop over energy values and write data to file
+        for (double E_k = 0.1 * cgs::MeV; E_k < 10. * cgs::GeV; E_k *= 1.1) {
+            outfile << std::scientific << std::setprecision(6);
+            outfile << E_k / cgs::MeV << "\t";             // 0
+            outfile << hubble_time(z) / cgs::Gyr << "\t";  // 1
+            const auto v = beta(E_k) * cgs::c_light;
+            outfile << v / (cgs::Mpc / cgs::Gyr) << "\t";                 // 2
+            outfile << (d / v) / cgs::Gyr << "\t";                        // 3
+            outfile << diffusion_time(B_IGM, d, E_k) / cgs::Gyr << "\t";  // 4
+            outfile << inelastic_time(n_H, E_k) / cgs::Gyr << "\t";       // 5
+            outfile << -E_k / dEdz_H(z, E_k) * j / cgs::Gyr << "\t";      // 6
+            outfile << E_k / dEdt_i(n_H, E_k) / cgs::Gyr << "\t";
+            outfile << E_k / dEdt_C(n_H, E_k) / cgs::Gyr << "\t";
+            outfile << E_k / dEdt_C(1e-3 * n_H, E_k) / cgs::Gyr << "\t";
+            outfile << larmor_radius(B_IGM, E_k) / cgs::Mpc << "\t";
+            outfile << "\n";
+        }
 
-	//double M = min_star_forming_halo(z);
+        outfile.close();  // Close the file
+        std::cout << "Data successfully written to " << OUTPUT_FILE << std::endl;
+    } catch (const std::ios_base::failure &e) {
+        std::cerr << "File I/O error: " << e.what() << std::endl;
+    }
+}
 
-	//cout << z << "\t" << M / mass_sun << "\t" << free_fall_timescale(z,M) << "\n";
-	
-	double alpha = 2.5;
-
-	double E_0 = 1.0 * GeV;
-
-	cout << alpha << "\t";
-
-	cout << compute_spectrum_normalization(E_0, 10. * keV, .01 * GeV, alpha) << "\t";
-
-    cout << compute_spectrum_normalization(E_0, 10. * keV, 1e6 * GeV, alpha) << "\t";
-
-	cout << compute_spectrum_normalization(E_0, 10. * keV, .01 * GeV, alpha) / compute_spectrum_normalization(E_0, 10. * keV, 1e6 * GeV, alpha) * 100.;
-
-	cout << "\n";
-
-	//cout << compute_spectrum_normalization(1. * GeV, 0.1 * GeV, 1e4 * GeV, 1e51 * erg, 2.2) << endl;
-
-	//cout << compute_spectrum_normalization(1. * GeV, 0.1 * GeV, 1e5 * GeV, 1e51 * erg, 2.2) << endl;
-
-	//cout << compute_spectrum_normalization(1. * GeV, 0.1 * GeV, 1e6 * GeV, 1e51 * erg, 2.2) << endl;
-
-	//cout << compute_spectrum_normalization(1. * GeV, 0.01 * GeV, 1e6 * GeV, 1e51 * erg, 2.2) << endl;
-
-	//cout << compute_spectrum_normalization(1. * GeV, 0.001 * GeV, 1e6 * GeV, 1e51 * erg, 2.2) << endl;
-
-	//print_timescales("output/timescales_at_z10.txt", 10);
-
-	//print_timescales("output/timescales_at_z20.txt", 20);
-
-	//for (double z = 0; z < 30; z += 1) {
-	//double l = UV_mean_free_path(z);
-	//cout << z << "\t" << l / Mpc << "\t" << c_light / sqrt(M_PI) / l / fast::hubble(z) / (1+z) << "\t" << 39. * pow((1. + z) / 4., -4.5) << "\n";
-	//}
-
-	//cout << 1. / H_0 / sqrt(Omega_m) / n_H_0 << "\n";
-
-    exit(1);
-
-	return;
+int main() {
+    print_diffusion_time();
+    return 0;
 }
