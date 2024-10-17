@@ -81,26 +81,24 @@ static const double mass_proton_c2 = mass_proton * c_light_squared;
 static const double mass_neutron = 1.67492735e-24 * gram;
 static const double mass_electron = 9.10938291e-28 * gram;
 static const double mass_electron_c2 = mass_electron * c_light_squared;
-static const double electron_radius =
-    2.8179409238e-13 * cm; /* e^2 / mc^2 classical electron radius. */
+static const double electron_radius = 2.8179409238e-13 * cm;
 static const double electron_charge = 4.80320425e-10 * statC;
 static const double mass_sun = 1.989e30 * kilogram;
 static const double h_planck = 6.62606957e-27 * erg * second;
 static const double h_bar_planck = h_planck / 2. / M_PI;
 static const double k_boltzmann = 1.3806488e-16 * erg / Kelvin;
 static const double G_N = 6.67259e-8 * pow3(cm) / gram / pow2(second);
-static const double pi_re2_me_c2_c =
-    M_PI * pow2(electron_radius) * c_light * mass_electron_c2; /* Pi * e^4 / mc */
-static const double pi_re_h_bar2_c2 =
-    M_PI * electron_radius * pow2(h_bar_planck) * pow2(c_light);  // erg^2* cm^3
+static const double sigma_th = 6.6524e-25 * pow2(cm);
+static const double alpha = 0.0072973525643;
 
-static const double A_H = 1;
-static const double Z_H = 1;
 static const double ionization_potential_H = 13.6 * eV;
-static const double A_He = 4;
-static const double Z_He = 2;
 static const double ionization_potential_He = 24.6 * eV;
-static const double W_H = 36.3 * eV;
+
+// static const double A_H = 1;
+// static const double Z_H = 1;
+// static const double A_He = 4;
+// static const double Z_He = 2;
+// static const double W_H = 36.3 * eV;
 
 // PLANCK Cosmological constants
 static const double hlittle = 0.6711;
@@ -123,6 +121,8 @@ static const double n_He_0 =
     rho_crit * Omega_b * Y_He / (4.0 * mass_proton);  /*  current helium number density estimate */
 static const double f_H = n_H_0 / (n_H_0 + n_He_0);   /* hydrogen number fraction */
 static const double f_He = n_He_0 / (n_H_0 + n_He_0); /* helium number fraction */
+
+static const double IGM_Temperature = 1e4 * cgs::K;
 
 // source constants
 static const double reference_energy = 1. * GeV;

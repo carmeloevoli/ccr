@@ -2,9 +2,13 @@
 
 #include <iostream>
 
-double lorentz_factor(double E_k) { return 1. + E_k / cgs::mass_proton_c2; }
+#include "gsl/gsl_sf_erf.h"
 
-double beta(double E_k) { return std::sqrt(1.0 - 1.0 / pow2(1.0 + E_k / cgs::mass_proton_c2)); }
+double gamma_lorentz(double E_k) { return 1. + E_k / cgs::mass_proton_c2; }
+
+double beta_lorentz(double E_k) {
+    return std::sqrt(1.0 - 1.0 / pow2(1.0 + E_k / cgs::mass_proton_c2));
+}
 
 double larmor_radius(double B, double E_k) {
     const auto p = E_k * sqrt(1. + 2. * cgs::mass_proton_c2 / E_k);
@@ -45,13 +49,7 @@ double sigma_pp(double E_k) {  // Kafexhiu et al. PRD 90, 2014
 
 double inelastic_time(double n_H, double E_k) {
     const auto sigma = sigma_pp(E_k);
-    return 1. / beta(E_k) / cgs::c_light / n_H / sigma;
-}
-
-double dEdz_H(double z, double E_k) {
-    auto value = E_k / (1. + z);
-    value *= 2. - 1. / (1. + cgs::mass_proton_c2 / E_k);
-    return value;
+    return 1. / beta_lorentz(E_k) / cgs::c_light / n_H / sigma;
 }
 
 /* function DTDZ returns the value of dt/dz at the redshift parameter z. */
@@ -68,35 +66,54 @@ double dtdz(double z) {
     return (const1 * numer / denom);
 }
 
+double dEdt_a(double z, double E_k) {
+    auto dEdz = E_k / (1. + z);
+    dEdz *= 2. - 1. / (1. + cgs::mass_proton_c2 / E_k);
+    return -dEdz / dtdz(z);
+}
+
+double Ionization_B(double IonPotential, double E_k) {
+    const auto beta = beta_lorentz(E_k);
+    const auto beta2 = pow2(beta);
+    const auto beta4 = pow4(beta);
+    const auto gamma = gamma_lorentz(E_k);
+    const auto gamma4 = pow4(gamma);
+    const auto mass_ratio = cgs::mass_electron / cgs::mass_proton;
+    const auto me2 = pow2(cgs::mass_electron_c2);
+    const auto I2 = pow2(IonPotential);
+    const auto factor = 4. * me2 * beta4 * gamma4 / I2 / (1. + 2 * gamma * mass_ratio);
+    return log(factor - 2. * beta2);
+}
+
 double dEdt_i(double n_HI, double E_k) {
-    const auto p2 = pow2(lorentz_factor(E_k)) - 1.;
-    const auto beta2 = pow2(beta(E_k));
-    const auto factor = 4. * cgs::pi_re2_me_c2_c / beta(E_k);
-    const auto A_H = cgs::Z_H * n_HI *
-                     (log(2. * cgs::mass_electron_c2 * p2 / cgs::ionization_potential_H) - beta2);
-    const auto A_He = cgs::Z_He * cgs::f_He * n_HI *
-                      (log(2. * cgs::mass_electron_c2 * p2 / cgs::ionization_potential_He) - beta2);
-    return factor * (A_H + A_He);
+    const auto beta = beta_lorentz(E_k);
+    const auto factor = 3. * cgs::c_light * cgs::sigma_th * cgs::mass_electron_c2 / 4. / beta;
+    const auto B_H = Ionization_B(cgs::ionization_potential_H, E_k);
+    const auto B_He = Ionization_B(cgs::ionization_potential_He, E_k);
+    return factor * n_HI * (B_H + cgs::f_He * B_He);
+}
+
+double Coulomb_ln(double n_e, double E_k) {
+    const auto factor = pow2(cgs::alpha) / M_PI / pow3(cgs::electron_radius) / n_e;
+    const auto beta = beta_lorentz(E_k);
+    const auto beta4 = pow4(beta);
+    const auto gamma = gamma_lorentz(E_k);
+    const auto gamma2 = pow2(gamma);
+    const auto mass_ratio = cgs::mass_electron / cgs::mass_proton;
+    return .5 * log(factor * gamma2 * beta4 / (1. + 2. * gamma * mass_ratio));
+}
+
+double Coulomb_W(double x) {
+    const auto value_a = gsl_sf_erf(x);
+    const auto value_b = 2. / sqrt(M_PI) * x * exp(-pow2(x));
+    return value_a - value_b;
 }
 
 double dEdt_C(double n_e, double E_k) {
-    const auto p = sqrt(pow2(lorentz_factor(E_k)) - 1.);
-    const auto w_pl = 5.64e4 * sqrt(n_e) / cgs::s;
-    const auto Coulomb_log =
-        log(2. * cgs::mass_electron_c2 * beta(E_k) / cgs::h_bar_planck / w_pl * p);
-    return 4. * cgs::pi_re2_me_c2_c / beta(E_k) * n_e * (Coulomb_log - pow2(beta(E_k)) / 2.);
-}
-
-double dEdt_C_Galprop(double n_e, double E_k) {
-    const auto beta_2 = pow2(beta(E_k));
-    const auto beta_3 = pow3(beta(E_k));
-    const auto temperature_electron = 1e4 * cgs::K;
-    const auto x_m = pow(3. * sqrt(M_PI) / 4., 1. / 3.) *
-                     sqrt(2. * cgs::k_boltzmann * temperature_electron / cgs::mass_electron_c2);
-    const auto x_m_3 = pow3(x_m);
-    const auto log_1 = pow2(cgs::mass_electron_c2) / cgs::pi_re_h_bar2_c2 / n_e;
-    const auto log_2 = cgs::mass_proton_c2 * pow2(lorentz_factor(E_k)) * pow4(beta(E_k)) /
-                       (cgs::mass_proton_c2 + 2. * lorentz_factor(E_k) * cgs::mass_electron_c2);
-    const auto Coulomb_log = 0.5 * log(log_1 * log_2);
-    return 4. * cgs::pi_re2_me_c2_c * n_e * Coulomb_log * (beta_2 / (x_m_3 + beta_3));
+    const auto factor = 3. * cgs::c_light * cgs::mass_electron_c2 * cgs::sigma_th / 2.;
+    const auto beta = beta_lorentz(E_k);
+    const auto beta_e = 2. * cgs::k_boltzmann * cgs::IGM_Temperature / cgs::mass_electron_c2;
+    const auto lnC = Coulomb_ln(n_e, E_k);
+    const auto W_e = Coulomb_W(beta / beta_e);
+    return factor * lnC / beta * n_e * W_e;
 }

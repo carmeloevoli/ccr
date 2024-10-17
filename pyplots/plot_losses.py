@@ -13,25 +13,31 @@ def plot_losses(filepath='figs/'):
 
     # Set the axes using the generalized set_axes function
     xlabel = r'E [MeV]'
-    ylabel = r'energy loss length [Mpc]'
+    ylabel = r'energy loss relative timescale'
     xscale = 'log'
     yscale = 'log'
-    xlim = (1, 1e3)
-    ylim = (1e-1, 1e4)
+    xlim = (1e-2, 1e4)
+    ylim = (1e-2, 1e2)
 
     # Configure the axes with the above settings
     set_axes(ax, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
 
     # Load data
-    filename = '../build/diffusion_time_output.txt'
-    E, t_H, v, t_a, t_ion, t_C, t_CG = np.loadtxt(filename, usecols=(0, 1, 2, 6, 7, 8, 9), unpack=True)
+    filename = '../build/losses_timescales_output.txt'
+    E, t_C_in, t_C_out, t_ion, t_a = np.loadtxt(filename, usecols=(0, 1, 2, 3, 4), unpack=True)
 
     # Plot the data
-    ax.plot(E, v * t_a, label='adiabatic', color='tab:red')
-    ax.plot(E, v * t_ion, label=r'ionization [$x_e = 0$]', color='tab:green')
-    ax.plot(E, v * t_C, label='Coulomb [$x_e = 1$]', color='tab:blue')
-    ax.plot(E, v * t_CG, label='Coulomb [$x_e = 10^{-3}$]', ls=':', color='tab:blue')
+    ax.plot(E, t_ion / t_a, label=r'ionization [$x_e = 0$]', color='tab:blue')
+    ax.plot(E, t_C_out / t_a, label='Coulomb [$x_e = 1$]', color='tab:orange')
+    ax.plot(E, t_C_in / t_a, label='Coulomb [$x_e = 10^{-3}$]', ls='-.', color='tab:orange')
 
+    ax.hlines(1., 1e-2, 1e8, ls=':', color='tab:gray')
+
+    ax.vlines(1.08112e-1, 1e-3, 1e2, ls='-', color='tab:orange')
+    ax.vlines(5.73160e+0, 1e-3, 1e2, ls='-', color='tab:blue')
+    ax.vlines(8.77068e+0, 1e-3, 1e2, ls='-.', color='tab:orange')
+
+    ax.text(1e3, 12, 'z = 12')
     # Add a legend
     ax.legend(fontsize=20)
 

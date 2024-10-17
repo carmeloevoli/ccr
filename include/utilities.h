@@ -5,9 +5,9 @@
 
 #include "constants.h"
 
-double beta(double E_k);
+double beta_lorentz(double E_k);
 
-double lorentz_factor(double E_k);
+double gamma_lorentz(double E_k);
 
 double dtdz(double z);
 
@@ -25,12 +25,10 @@ double n_H_physical(double z);
 
 double inelastic_time(double n_H, double E_k);
 
-double dEdz_H(double z, double E_k);
+double dEdt_a(double z, double E_k);
 
-double dEdt_i(double z, double E_k);
+double dEdt_i(double n_HI, double E_k);
 
 double dEdt_C(double n_e, double E_k);
-
-double dEdt_C_Galprop(double n_e, double E_k);
 
 #endif /* UTILITIES_H_ */
