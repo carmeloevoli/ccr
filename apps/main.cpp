@@ -1,7 +1,8 @@
 #include <fstream>
-#include <iomanip>  // For std::scientific and std::setprecision
+#include <iomanip>
 #include <iostream>
 
+#include "ccrh.h"
 #include "constants.h"
 #include "utilities.h"
 
@@ -22,9 +23,10 @@ void print_energy_losses() {
     try {
         std::ofstream outfile = open_output_file("losses_timescales_output.txt");
         const auto n_H = n_H_physical(Z_VALUE);
-        for (double E_k = 1e-2 * cgs::MeV; E_k < 1e6 * cgs::MeV; E_k *= 1.1) {
+        for (double E_k = 1e-3 * cgs::MeV; E_k < 1e6 * cgs::MeV; E_k *= 1.1) {
             outfile << std::scientific << std::setprecision(6);
             outfile << E_k / cgs::MeV << "\t";
+            outfile << beta_lorentz(E_k) * cgs::c_light / (cgs::Mpc / cgs::year) << "\t";
             outfile << E_k / dEdt_C(n_H, E_k) / cgs::year << "\t";
             outfile << E_k / dEdt_C(0.0014 * n_H, E_k) / cgs::year << "\t";
             outfile << E_k / dEdt_i(n_H, E_k) / cgs::year << "\t";
@@ -39,40 +41,59 @@ void print_energy_losses() {
 // Main function to print diffusion time
 void print_diffusion_time() {
     try {
-        std::ofstream outfile = open_output_file("diffusion_time_output.txt");
-
+        std::ofstream outfile = open_output_file("diffusion_timescales_output.txt");
         const auto z = Z_VALUE;
         const auto B_IGM = 1e-16 * cgs::Gauss;
-        const auto n_H = n_H_physical(z);
         const auto d = cgs::Mpc / (1. + z);
-        const auto j = dtdz(z);
-
-        // Loop over energy values and write data to file
-        for (double E_k = 0.1 * cgs::MeV; E_k < 10. * cgs::GeV; E_k *= 1.1) {
+        for (double E_k = 1e-2 * cgs::MeV; E_k < 1e6 * cgs::MeV; E_k *= 1.1) {
             outfile << std::scientific << std::setprecision(6);
             outfile << E_k / cgs::MeV << "\t";             // 0
             outfile << hubble_time(z) / cgs::Gyr << "\t";  // 1
             const auto v = beta_lorentz(E_k) * cgs::c_light;
-            outfile << v / (cgs::Mpc / cgs::Gyr) << "\t";                 // 2
             outfile << (d / v) / cgs::Gyr << "\t";                        // 3
             outfile << diffusion_time(B_IGM, d, E_k) / cgs::Gyr << "\t";  // 4
-            outfile << inelastic_time(n_H, E_k) / cgs::Gyr << "\t";       // 5
-            // outfile << -E_k / dEdz_H(z, E_k) * j / cgs::Gyr << "\t";      // 6
-            outfile << E_k / dEdt_i(n_H, E_k) / cgs::Gyr << "\t";
-            outfile << E_k / dEdt_C(n_H, E_k) / cgs::Gyr << "\t";
-            outfile << E_k / dEdt_C(1e-3 * n_H, E_k) / cgs::Gyr << "\t";
-            outfile << larmor_radius(B_IGM, E_k) / cgs::Mpc << "\t";
             outfile << "\n";
         }
-
         outfile.close();  // Close the file
     } catch (const std::ios_base::failure &e) {
         std::cerr << "File I/O error: " << e.what() << std::endl;
     }
 }
 
+void print_spectrum() {
+    try {
+        std::cout << SN_ESpectrum_integral(2.4) << "\n";
+        const auto E_0 = cgs::mass_proton_c2;
+        const auto L = 1e-33 * cgs::erg / cgs::cm3 / cgs::s;
+
+        std::ofstream outfile = open_output_file("energy_spectrum_output.txt");
+        for (double E_k = 1e-3 * cgs::MeV; E_k < 1e9 * cgs::MeV; E_k *= 1.1) {
+            outfile << std::scientific << std::setprecision(6);
+            outfile << E_k / cgs::MeV << "\t";
+            auto Q_norm = L / pow2(E_0) / SN_ESpectrum_integral(2.0);
+            outfile << pow2(E_k) * Q_norm * SN_Spectrum(E_k, 2.0) / cgs::erg << "\t";
+            Q_norm = L / pow2(E_0) / SN_ESpectrum_integral(2.4);
+            outfile << pow2(E_k) * Q_norm * SN_Spectrum(E_k, 2.4) / cgs::erg << "\t";
+            Q_norm = L / pow2(E_0) / SN_ESpectrum_integral(2.7);
+            outfile << pow2(E_k) * Q_norm * SN_Spectrum(E_k, 2.7) / cgs::erg << "\t";
+            outfile << "\n";
+        }
+        outfile.close();
+    } catch (const std::ios_base::failure &e) {
+        std::cerr << "File I/O error: " << e.what() << std::endl;
+    }
+}
+
+void ccrh() {
+    CCRH ccrh;
+    // ccrh.init_vectors();
+    // ccrh.evolve();
+}
+
 int main() {
     print_energy_losses();
     // print_diffusion_time();
+    print_spectrum();
+    // ccrh();
     return 0;
 }

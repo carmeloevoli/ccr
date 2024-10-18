@@ -16,15 +16,15 @@ def plot_timescales(filepath='figs/'):
     ylabel = r'timescale [Gyr]'
     xscale = 'log'
     yscale = 'log'
-    xlim = (1, 1e4)
+    xlim = (1e-2, 1e4)
     ylim = (1e-4, 1e1)
     
     # Configure the axes with the above settings
     set_axes(ax, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
 
     # Load data
-    filename = '../build/diffusion_time_output.txt'
-    E, t_H, t_light, t_D = np.loadtxt(filename, usecols=(0, 1, 3, 4), unpack=True)
+    filename = '../build/diffusion_timescales_output.txt'
+    E, t_H, t_light, t_D = np.loadtxt(filename, usecols=(0, 1, 2, 3), unpack=True)
 
     # Plot the data
     z = 10.

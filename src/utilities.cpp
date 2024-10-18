@@ -1,13 +1,15 @@
 #include "utilities.h"
 
-#include <iostream>
+#include <gsl/gsl_integration.h>
+#include <gsl/gsl_sf_erf.h>
 
-#include "gsl/gsl_sf_erf.h"
+#include <iostream>
 
 double gamma_lorentz(double E_k) { return 1. + E_k / cgs::mass_proton_c2; }
 
 double beta_lorentz(double E_k) {
-    return std::sqrt(1.0 - 1.0 / pow2(1.0 + E_k / cgs::mass_proton_c2));
+    const auto gamma2 = pow2(gamma_lorentz(E_k));
+    return std::sqrt(1.0 - 1.0 / gamma2);
 }
 
 double larmor_radius(double B, double E_k) {
@@ -90,7 +92,8 @@ double dEdt_i(double n_HI, double E_k) {
     const auto factor = 3. * cgs::c_light * cgs::sigma_th * cgs::mass_electron_c2 / 4. / beta;
     const auto B_H = Ionization_B(cgs::ionization_potential_H, E_k);
     const auto B_He = Ionization_B(cgs::ionization_potential_He, E_k);
-    return factor * n_HI * (B_H + cgs::f_He * B_He);
+    const auto B = B_H + cgs::f_He * B_He;
+    return (B > 0.) ? factor * n_HI * B : 0.;
 }
 
 double Coulomb_ln(double n_e, double E_k) {
@@ -113,7 +116,42 @@ double dEdt_C(double n_e, double E_k) {
     const auto factor = 3. * cgs::c_light * cgs::mass_electron_c2 * cgs::sigma_th / 2.;
     const auto beta = beta_lorentz(E_k);
     const auto beta_e = 2. * cgs::k_boltzmann * cgs::IGM_Temperature / cgs::mass_electron_c2;
-    const auto lnC = Coulomb_ln(n_e, E_k);
+    const auto ln_C = Coulomb_ln(n_e, E_k);
     const auto W_e = Coulomb_W(beta / beta_e);
-    return factor * lnC / beta * n_e * W_e;
+    return factor * ln_C / beta * n_e * W_e;
+}
+
+double SN_Spectrum(double Ek, double alpha) {
+    const auto E0 = cgs::mass_proton_c2;
+    const auto beta = beta_lorentz(Ek);
+    const auto beta_0 = beta_lorentz(E0);
+    const auto p = sqrt(pow2(Ek) + 2. * cgs::mass_proton_c2 * Ek);
+    const auto p_0 = sqrt(pow2(E0) + 2. * cgs::mass_proton_c2 * E0);
+    return beta_0 / beta * pow(p / p_0, -alpha);
+}
+
+double SN_ESpectrum_integrand(double x, void* params) {
+    double alpha = *(double*)params;
+    double E = exp(x);
+    return E * E * SN_Spectrum(E, alpha);
+}
+
+double SN_ESpectrum_integral(double alpha) {
+    size_t N = 10000;
+    gsl_integration_workspace* w = gsl_integration_workspace_alloc(N);
+
+    double result, error;
+    gsl_function F;
+    F.function = &SN_ESpectrum_integrand;
+    F.params = &alpha;
+
+    const auto Ek_min = 1e-6 * cgs::MeV;
+    const auto Ek_max = 1e6 * cgs::MeV;
+    const auto E0 = cgs::mass_proton_c2;
+
+    gsl_integration_qag(&F, log(Ek_min), log(Ek_max), 0, 1e-5, N, 3, w, &result, &error);
+
+    gsl_integration_workspace_free(w);
+
+    return result / pow2(E0);
 }

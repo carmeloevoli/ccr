@@ -31,4 +31,8 @@ double dEdt_i(double n_HI, double E_k);
 
 double dEdt_C(double n_e, double E_k);
 
+double SN_Spectrum(double Ek, double alpha);
+
+double SN_ESpectrum_integral(double alpha);
+
 #endif /* UTILITIES_H_ */
