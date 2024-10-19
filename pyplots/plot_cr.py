@@ -23,7 +23,7 @@ def plot_spectrum(filepath='figs/'):
     set_axes(ax, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
 
     # Load data
-    filename = '../build/energy_spectrum_output.txt'
+    filename = 'output/energy_spectrum_output.txt'
     E, Q20, Q24, Q27 = np.loadtxt(filename, usecols=(0, 1, 2, 3), unpack=True)
 
     # Plot the data
@@ -55,7 +55,7 @@ def plot_solution(filepath='figs/'):
     set_axes(ax, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
 
     # Load data
-    filename = '../build/ccrh_solution.txt'
+    filename = 'output/ccrh_solution.txt'
     E, N, Q = np.loadtxt(filename, usecols=(0, 1, 2), unpack=True)
     E2 = E * E
 
@@ -83,7 +83,7 @@ def plot_rates(filepath='figs/'):
     set_axes(ax, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
 
     # Load data
-    filename = '../build/ccrh_solution.txt'
+    filename = 'output/ccrh_solution.txt'
     E, I, C = np.loadtxt(filename, usecols=(0, 3, 4), unpack=True)
 
     ax.plot(E, I / I[0], color='tab:blue', label='ionization')

@@ -23,7 +23,7 @@ def plot_losses(filepath='figs/'):
     set_axes(ax, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
 
    # Load data
-    filename = '../build/losses_timescales_output.txt'
+    filename = 'output/losses_timescales_output.txt'
     E, v, t_C_in, t_C_out, t_ion, t_a = np.loadtxt(filename, usecols=(0, 1, 2, 3, 4, 5), unpack=True)
 
     # Plot the data
@@ -55,14 +55,14 @@ def plot_lengths(filepath='figs/'):
     ylabel = r'energy loss length [Mpc]'
     xscale = 'log'
     yscale = 'log'
-    xlim = (1e-3, 1e4)
+    xlim = (1e-2, 1e4)
     ylim = (1e-4, 1e4)
 
     # Configure the axes with the above settings
     set_axes(ax, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, xlim=xlim, ylim=ylim)
 
     # Load data
-    filename = '../build/losses_timescales_output.txt'
+    filename = 'output/losses_timescales_output.txt'
     E, v, t_C_in, t_C_out, t_ion, t_a = np.loadtxt(filename, usecols=(0, 1, 2, 3, 4, 5), unpack=True)
 
     # Plot the data
