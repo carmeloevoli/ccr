@@ -1,8 +1,6 @@
 #ifndef CCRH_UTILITIES_H_
 #define CCRH_UTILITIES_H_
 
-#include <string>
-
 #include "constants.h"
 
 double beta_lorentz(double E_k);

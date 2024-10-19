@@ -53,8 +53,9 @@ add_library(CCRH SHARED
     #src/misc.cpp
     #src/ps.cpp
     #src/reionization.cpp
-    #src/SFR.cpp
-    #src/tridiag.cpp
+    src/ccrh.cpp
+    src/io.cpp
+    src/tridiag.cpp
     src/utilities.cpp
     )
     target_link_libraries(CCRH ${CCRH_EXTRA_LIBRARIES})
@@ -69,6 +70,9 @@ file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/output)
 # make apps
 add_executable(run apps/main.cpp)
 target_link_libraries (run CCRH ${CCRH_EXTRA_LIBRARIES})
+
+add_executable(print apps/print.cpp)
+target_link_libraries (print CCRH ${CCRH_EXTRA_LIBRARIES})
 
 # Show summary.
 message (STATUS "CMAKE_SYSTEM .......... = ${CMAKE_SYSTEM}")
